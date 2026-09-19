@@ -95,6 +95,6 @@ evidence:
 ---
 Body.
 `,
-    /interaction.*Invalid input/s,
+    /interaction.*Invalid option/s,
   );
 });

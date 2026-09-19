@@ -31,7 +31,7 @@ export const workCategories = [
   "Computational investigations",
   "Visual explanations",
 ] as const;
-export const workInteractions = ["sorting-bars"] as const;
+export const workInteractions = ["sorting-bars", "correlation-experiment"] as const;
 
 const notes = defineCollection({
   loader: glob({

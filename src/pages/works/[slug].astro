@@ -3,6 +3,7 @@ import type { GetStaticPaths } from "astro";
 import { getCollection, render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import SortingBars from "../../components/SortingBars";
+import CorrelationExperiment from "../../components/CorrelationExperiment";
 
 export const getStaticPaths = (async () => {
   const works = await getCollection("works", ({ data }) => data.lifecycle === "published");
@@ -20,6 +21,7 @@ const { data } = work;
       <dl class="note-facts"><div><dt>Subject</dt><dd>{data.subject}</dd></div><div><dt>Medium</dt><dd>{data.media.join(", ")}</dd></div><div><dt>Capability</dt><dd>{data.capabilities.join(", ")}</dd></div><div><dt>Applicant contribution</dt><dd>{data.contribution}</dd></div></dl>
     </header>
     {data.interaction === "sorting-bars" && <SortingBars client:load />}
+    {data.interaction === "correlation-experiment" && <CorrelationExperiment client:load />}
     <div class="case-evidence">
       <section><h2>Problem</h2><p>{data.evidence.problem}</p></section><section><h2>Hypothesis</h2><p>{data.evidence.hypothesis}</p></section><section><h2>Process</h2><p>{data.evidence.process}</p></section><section><h2>Key decisions</h2><p>{data.evidence.decisions}</p></section><section><h2>Outcome</h2><p>{data.evidence.outcome}</p></section><section><h2>Validation</h2><p>{data.evidence.validation}</p></section><section><h2>Limitations</h2><p>{data.evidence.limitations}</p></section>
       <div class="note-body"><Content /></div>

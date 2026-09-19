@@ -446,7 +446,8 @@ main {
   flex: 1;
   max-width: 5rem;
 }
-.sorting-demo button {
+.sorting-demo button,
+.correlation-demo button {
   background: var(--color-ink);
   border: 0;
   color: var(--color-paper);
@@ -464,6 +465,82 @@ main {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
+}
+
+.correlation-demo {
+  border-bottom: 1px solid var(--color-line);
+  padding: 3rem 0;
+}
+
+.correlation-controls {
+  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.correlation-controls label {
+  display: grid;
+  font-weight: 650;
+  gap: 0.4rem;
+  min-width: 14rem;
+}
+
+.correlation-controls input[type="range"] {
+  accent-color: var(--color-accent);
+  width: 100%;
+}
+
+.correlation-controls input[type="number"] {
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  font: inherit;
+  padding: 0.55rem 0.65rem;
+  width: 100%;
+}
+
+.correlation-checkbox {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  gap: 0.6rem !important;
+  min-width: auto !important;
+}
+
+.correlation-demo button {
+  align-self: end;
+}
+
+.correlation-plot {
+  display: block;
+  height: auto;
+  max-width: 52rem;
+  width: 100%;
+}
+
+.ce-point {
+  fill: var(--color-accent);
+  fill-opacity: 0.6;
+}
+
+.ce-outlier {
+  fill: var(--color-warning);
+  fill-opacity: 0.85;
+}
+
+.ce-reg-line {
+  fill: none;
+  stroke: var(--color-ink);
+  stroke-dasharray: 1.5 0.8;
+  stroke-width: 0.5;
+}
+
+.correlation-summary {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0.75rem 0 0;
+  max-width: 52rem;
 }
 .visually-hidden {
   clip: rect(0 0 0 0);

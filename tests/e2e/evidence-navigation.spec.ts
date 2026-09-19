@@ -23,12 +23,13 @@ test("Home connects featured evidence, the latest Note and chronological publish
   await expect(page.getByRole("region", { name: "Featured Work" }).getByRole("link", { name: "Sorting algorithm visualiser" })).toHaveAttribute("href", "/works/fixture-sorting-algorithm-visualiser/");
   await expect(page.getByRole("region", { name: "Latest Note" }).getByRole("link", { name: "Completing the square, visually" })).toHaveAttribute("href", "/notes/completing-the-square/");
   const activity = page.getByRole("region", { name: "Recent activity" });
-  await expect(activity.getByRole("listitem")).toHaveCount(5);
+  await expect(activity.getByRole("listitem")).toHaveCount(6);
   await expect(activity.getByRole("listitem").nth(0)).toContainText("Fixture research presentation");
   await expect(activity.getByRole("listitem").nth(1)).toContainText("Completing the square, visually");
   await expect(activity.getByRole("listitem").nth(2)).toContainText("Sorting algorithm visualiser");
   await expect(activity.getByRole("listitem").nth(3)).toContainText("Tracing a loop");
   await expect(activity.getByRole("listitem").nth(4)).toContainText("Fixture model check");
+  await expect(activity.getByRole("listitem").nth(5)).toContainText("Correlation and regression experiment");
   await expect(page.getByText(/Hidden (draft|review)/)).toHaveCount(0);
   for (const link of await activity.getByRole("link").all()) {
     await link.click();
@@ -45,15 +46,17 @@ test("Works filters hide unmatched groups and every Capability links to publishe
   await page.keyboard.press("Enter");
   await expect(page.getByLabel("Subject", { exact: true })).toHaveValue("Mathematics");
   await expect(works.getByRole("link", { name: "Fixture model check" })).toBeVisible();
-  await expect(works.getByRole("heading", { name: "Interactive systems" })).toBeHidden();
+  await expect(works.getByRole("link", { name: "Correlation and regression experiment" })).toBeVisible();
+  await expect(works.getByRole("heading", { name: "Interactive systems" })).toBeVisible();
   await page.getByLabel("Medium", { exact: true }).selectOption("Web experience");
-  await expect(page.getByRole("status")).toHaveText("0 results");
+  await expect(page.getByRole("status")).toHaveText("1 result");
   await page.getByRole("button", { name: "Clear filters" }).click();
   await page.getByLabel("Capability", { exact: true }).selectOption("Builds a computational model");
   await expect(works.getByRole("link", { name: "Sorting algorithm visualiser" })).toBeVisible();
   await expect(works.getByRole("link", { name: "Fixture model check" })).toBeHidden();
+  await expect(works.getByRole("link", { name: "Correlation and regression experiment" })).toBeHidden();
   await expect(page.getByRole("option", { name: "3D animation", exact: true })).toHaveCount(0);
-  await expect(page.getByRole("option", { name: "Interprets evidence", exact: true })).toHaveCount(0);
+  await expect(page.getByRole("option", { name: "Interprets evidence", exact: true })).toHaveCount(1);
   await expect(page.getByRole("heading", { name: "Visual explanations" })).toHaveCount(0);
   const capabilities = page.getByRole("region", { name: "Capabilities" });
   for (const capability of await capabilities.getByRole("article").all()) {
@@ -89,7 +92,7 @@ for (const width of [1440, 375]) {
       if (width === 375) await expect(page.getByRole("navigation", { name: "Mobile" })).toBeHidden();
     }
     await page.getByLabel("Subject", { exact: true }).selectOption("Mathematics");
-    await expect(page.getByRole("status")).toHaveText("1 result");
+    await expect(page.getByRole("status")).toHaveText("2 results");
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.screenshot({ path: testInfo.outputPath(`works-${width}.png`), fullPage: true });
     await page.goto("/");
@@ -104,11 +107,11 @@ test.describe("static evidence", () => {
   test.use({ javaScriptEnabled: false });
   test("Home and filtered indexes preserve evidence without JavaScript", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByRole("region", { name: "Recent activity" }).getByRole("listitem")).toHaveCount(5);
-    for (const route of ["/works/", "/notes/"]) {
+    await expect(page.getByRole("region", { name: "Recent activity" }).getByRole("listitem")).toHaveCount(6);
+    for (const [route, linkCount] of [["/works/", 3], ["/notes/", 2]] as const) {
       await page.goto(route);
       await expect(page.getByRole("form", { name: "Filter published evidence" })).toBeHidden();
-      await expect(page.locator("evidence-filters").getByRole("link")).toHaveCount(2);
+      await expect(page.locator("evidence-filters").getByRole("link")).toHaveCount(linkCount);
       await page.locator("evidence-filters").getByRole("link").first().click();
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     }

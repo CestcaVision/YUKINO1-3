@@ -50,19 +50,30 @@ test("Capabilities appear only with links to published evidence", async ({
 }) => {
   await page.goto("/works/");
 
-  const capability = page.getByRole("heading", {
+  const buildsCapability = page.getByRole("heading", {
     level: 3,
     name: "Builds a computational model",
   });
-  await expect(capability).toBeVisible();
+  await expect(buildsCapability).toBeVisible();
   await expect(
-    capability
+    buildsCapability
       .locator("..")
       .getByRole("link", { name: "Sorting algorithm visualiser", exact: true }),
   ).toBeVisible();
+
+  const interpretsCapability = page.getByRole("heading", {
+    level: 3,
+    name: "Interprets evidence",
+  });
+  await expect(interpretsCapability).toBeVisible();
   await expect(
-    page.getByText("Interprets evidence", { exact: true }),
-  ).toHaveCount(0);
+    interpretsCapability
+      .locator("..")
+      .getByRole("link", {
+        name: "Correlation and regression experiment",
+        exact: true,
+      }),
+  ).toBeVisible();
 });
 
 test("draft and review Works have no production surface", async ({
