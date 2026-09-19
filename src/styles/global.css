@@ -4,15 +4,24 @@
   --color-muted: #5f6066;
   --color-line: #c9cbd1;
   --color-accent: #1e4ed8;
+  --color-surface: #f6f7f9;
+  --color-warning: #9a4d00;
   --font-display:
     "Newsreader Variable", "Iowan Old Style", Baskerville, Georgia, serif;
   --font-ui: "Inter Variable", Inter, system-ui, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
   --gutter: clamp(1.25rem, 4vw, 4rem);
   --content-width: 94rem;
 }
 
 * {
   box-sizing: border-box;
+}
+
+time {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
 }
 
 html {
@@ -357,7 +366,7 @@ main {
   background: var(--color-paper);
   padding: 1.5rem;
 }
-.capability-list h2 {
+.capability-list h3 {
   font-family: var(--font-display);
   font-size: 1.6rem;
   font-weight: 500;
@@ -366,6 +375,10 @@ main {
 .capability-list ul {
   margin: 0;
   padding-left: 1.2rem;
+}
+.capability-list li a {
+  display: block;
+  padding: 0.2rem 0;
 }
 
 .case-study {
@@ -492,7 +505,7 @@ main {
 }
 
 .draft-badge {
-  color: #9a4d00;
+  color: var(--color-warning);
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -575,7 +588,7 @@ main {
 }
 
 .note-body pre {
-  background: #f4f5f7;
+  background: var(--color-surface);
   border-left: 3px solid var(--color-accent);
   font-family: ui-monospace, monospace;
   font-size: 0.88rem;
@@ -614,10 +627,10 @@ main {
   .mobile-menu summary {
     cursor: pointer;
     font-size: 0;
-    height: 2rem;
+    height: 2.75rem;
     list-style: none;
     position: relative;
-    width: 2rem;
+    width: 2.75rem;
   }
 
   .mobile-menu summary::-webkit-details-marker {
@@ -636,15 +649,15 @@ main {
   }
 
   .mobile-menu summary::before {
-    top: 0.45rem;
+    top: 0.875rem;
   }
 
   .mobile-menu summary span::after {
-    top: 0.95rem;
+    top: 1.375rem;
   }
 
   .mobile-menu summary::after {
-    top: 1.45rem;
+    top: 1.875rem;
   }
 
   .mobile-menu nav {
@@ -751,6 +764,8 @@ main {
   *,
   *::before,
   *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }

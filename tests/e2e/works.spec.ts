@@ -51,7 +51,7 @@ test("Capabilities appear only with links to published evidence", async ({
   await page.goto("/works/");
 
   const capability = page.getByRole("heading", {
-    level: 2,
+    level: 3,
     name: "Builds a computational model",
   });
   await expect(capability).toBeVisible();

@@ -2,6 +2,7 @@ import { execSync } from "node:child_process";
 import { rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test } from "@playwright/test";
+import { stripAnsi } from "./helpers";
 
 const workContentDirectory = "./tests/fixtures/works";
 const worksDirectory = join(process.cwd(), workContentDirectory);
@@ -28,9 +29,10 @@ function expectBuildFailure(
       stderr?: string;
       message: string;
     };
-    expect(
+    const output = stripAnsi(
       `${failure.stdout ?? ""}\n${failure.stderr ?? ""}\n${failure.message}`,
-    ).toMatch(expectedMessage);
+    );
+    expect(output).toMatch(expectedMessage);
   } finally {
     rmSync(fixturePath, { force: true });
   }

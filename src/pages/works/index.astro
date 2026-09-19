@@ -27,7 +27,7 @@ const categories = [...new Set(works.map((work) => work.data.category))];
     </EvidenceFilters>
     {capabilities.length > 0 && <section class="capabilities" aria-labelledby="capabilities-title">
       <p class="eyebrow">Evidence map</p><h2 id="capabilities-title">Capabilities</h2>
-      <div class="capability-list">{capabilities.map((capability) => <article><h2>{capability}</h2><ul>{evidence.filter((item) => item.capabilities.includes(capability)).map((item) => <li><a href={item.href}>{item.title}</a></li>)}</ul></article>)}</div>
+      <div class="capability-list">{capabilities.map((capability) => <article><h3>{capability}</h3><ul>{evidence.filter((item) => item.capabilities.includes(capability)).map((item) => <li><a href={item.href}>{item.title}</a></li>)}</ul></article>)}</div>
     </section>}
   </section>
 </BaseLayout>
