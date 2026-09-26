@@ -31,29 +31,34 @@ export const workCategories = [
   "Computational investigations",
   "Visual explanations",
 ] as const;
-export const workInteractions = ["sorting-bars", "correlation-experiment"] as const;
+export const workInteractions = [
+  "sorting-bars",
+  "correlation-experiment",
+] as const;
 
 const notes = defineCollection({
   loader: glob({
     base: process.env.NOTE_CONTENT_DIRECTORY ?? "./src/content/notes",
     pattern: "**/*.md",
   }),
-  schema: z.object({
-    title: z.string().trim().min(1),
-    summary: z.string().trim().min(1),
-    slug: z
-      .string()
-      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use a stable kebab-case slug"),
-    date: z.coerce.date(),
-    updated: z.coerce.date().optional(),
-    lifecycle: z.enum(["draft", "review", "published"]),
-    subject: z.enum(noteSubjects),
-    media: z.array(z.enum(noteMedia)).min(1),
-    capabilities: z.array(z.enum(noteCapabilities)).min(1),
-  }).refine(
-    (data) => !data.updated || data.updated >= data.date,
-    { message: "updated must not be before date", path: ["updated"] },
-  ),
+  schema: z
+    .object({
+      title: z.string().trim().min(1),
+      summary: z.string().trim().min(1),
+      slug: z
+        .string()
+        .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use a stable kebab-case slug"),
+      date: z.coerce.date(),
+      updated: z.coerce.date().optional(),
+      lifecycle: z.enum(["draft", "review", "published"]),
+      subject: z.enum(noteSubjects),
+      media: z.array(z.enum(noteMedia)).min(1),
+      capabilities: z.array(z.enum(noteCapabilities)).min(1),
+    })
+    .refine((data) => !data.updated || data.updated >= data.date, {
+      message: "updated must not be before date",
+      path: ["updated"],
+    }),
 });
 
 const works = defineCollection({
@@ -61,40 +66,43 @@ const works = defineCollection({
     base: process.env.WORK_CONTENT_DIRECTORY ?? "./src/content/works",
     pattern: "**/*.md",
   }),
-  schema: z.object({
-    title: z.string().trim().min(1),
-    summary: z.string().trim().min(1),
-    slug: z
-      .string()
-      .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use a stable kebab-case slug"),
-    date: z.coerce.date(),
-    updated: z.coerce.date().optional(),
-    lifecycle: z.enum(["draft", "review", "published"]),
-    subject: z.enum(noteSubjects),
-    category: z.enum(workCategories),
-    media: z.array(z.enum(workMedia)).min(1),
-    capabilities: z.array(z.enum(noteCapabilities)).min(1),
-    contribution: z.string().trim().min(1),
-    interaction: z.enum(workInteractions).optional(),
-    evidence: z.object({
-      problem: z.string().trim().min(1),
-      hypothesis: z.string().trim().min(1),
-      process: z.string().trim().min(1),
-      decisions: z.string().trim().min(1),
-      outcome: z.string().trim().min(1),
-      validation: z.string().trim().min(1),
-      limitations: z.string().trim().min(1),
+  schema: z
+    .object({
+      title: z.string().trim().min(1),
+      summary: z.string().trim().min(1),
+      slug: z
+        .string()
+        .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use a stable kebab-case slug"),
+      date: z.coerce.date(),
+      updated: z.coerce.date().optional(),
+      lifecycle: z.enum(["draft", "review", "published"]),
+      subject: z.enum(noteSubjects),
+      category: z.enum(workCategories),
+      media: z.array(z.enum(workMedia)).min(1),
+      capabilities: z.array(z.enum(noteCapabilities)).min(1),
+      contribution: z.string().trim().min(1),
+      interaction: z.enum(workInteractions).optional(),
+      evidence: z.object({
+        problem: z.string().trim().min(1),
+        hypothesis: z.string().trim().min(1),
+        process: z.string().trim().min(1),
+        decisions: z.string().trim().min(1),
+        outcome: z.string().trim().min(1),
+        validation: z.string().trim().min(1),
+        limitations: z.string().trim().min(1),
+      }),
+    })
+    .refine((data) => !data.updated || data.updated >= data.date, {
+      message: "updated must not be before date",
+      path: ["updated"],
     }),
-  }).refine(
-    (data) => !data.updated || data.updated >= data.date,
-    { message: "updated must not be before date", path: ["updated"] },
-  ),
 });
 
 const academicResultLoader = glob({
   base: pathToFileURL(
     resolve(
-      process.env.ACADEMIC_RESULT_CONTENT_DIRECTORY ?? "./src/content/academic-results",
+      process.env.ACADEMIC_RESULT_CONTENT_DIRECTORY ??
+        "./src/content/academic-results",
     ) + "/",
   ),
   pattern: "**/*.md",
@@ -112,10 +120,14 @@ const academicResults = defineCollection({
   schema: z.object({
     qualification: z.string().trim().min(1),
     subject: z.string().trim().min(1).optional(),
-    result: z.string().trim().min(1).refine(
-      (value) => !/^(pending|tbd|tbc|n\/?a|[-–—]+)$/i.test(value),
-      "Record a real grade or score, not a placeholder",
-    ),
+    result: z
+      .string()
+      .trim()
+      .min(1)
+      .refine(
+        (value) => !/^(pending|tbd|tbc|n\/?a|[-–—]+)$/i.test(value),
+        "Record a real grade or score, not a placeholder",
+      ),
     status: z.enum(["predicted", "achieved"]),
     awardingBody: z.string().trim().min(1),
     examinationSession: z.string().trim().min(1),

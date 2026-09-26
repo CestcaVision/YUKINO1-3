@@ -16,17 +16,51 @@ const { data } = note;
 
 <article class="note-detail">
   <header class="note-header">
-    <a class="note-back" href={backHref}>{backLabel}</a>
-    {preview && <p class="draft-badge">Development-only {data.lifecycle} preview</p>}
+    <a class="note-back" href={backHref}>
+      {backLabel}
+    </a>
+    {preview && (
+      <p class="draft-badge">Development-only {data.lifecycle} preview</p>
+    )}
     <h1>{data.title}</h1>
     <p class="note-summary">{data.summary}</p>
     <dl class="note-facts">
-      <div><dt>Date</dt><dd><time datetime={data.date.toISOString()}>{data.date.toLocaleDateString("en-GB", { dateStyle: "long" })}</time></dd></div>
-      <div><dt>Subject</dt><dd>{data.subject}</dd></div>
-      <div><dt>Medium</dt><dd>{data.media.join(", ")}</dd></div>
-      <div><dt>Capability</dt><dd>{data.capabilities.join(", ")}</dd></div>
-      {data.updated && <div><dt>Updated</dt><dd><time datetime={data.updated.toISOString()}>{data.updated.toLocaleDateString("en-GB", { dateStyle: "long", timeZone: "UTC" })}</time></dd></div>}
+      <div>
+        <dt>Date</dt>
+        <dd>
+          <time datetime={data.date.toISOString()}>
+            {data.date.toLocaleDateString("en-GB", { dateStyle: "long" })}
+          </time>
+        </dd>
+      </div>
+      <div>
+        <dt>Subject</dt>
+        <dd>{data.subject}</dd>
+      </div>
+      <div>
+        <dt>Medium</dt>
+        <dd>{data.media.join(", ")}</dd>
+      </div>
+      <div>
+        <dt>Capability</dt>
+        <dd>{data.capabilities.join(", ")}</dd>
+      </div>
+      {data.updated && (
+        <div>
+          <dt>Updated</dt>
+          <dd>
+            <time datetime={data.updated.toISOString()}>
+              {data.updated.toLocaleDateString("en-GB", {
+                dateStyle: "long",
+                timeZone: "UTC",
+              })}
+            </time>
+          </dd>
+        </div>
+      )}
     </dl>
   </header>
-  <div class="note-body"><Content /></div>
+  <div class="note-body">
+    <Content />
+  </div>
 </article>

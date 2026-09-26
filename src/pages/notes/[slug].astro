@@ -6,12 +6,17 @@ import NoteArticle from "../../components/NoteArticle.astro";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 
 export const getStaticPaths = (async () => {
-  const publishedNotes = await getCollection("notes", ({ data }) => data.lifecycle === "published");
+  const publishedNotes = await getCollection(
+    "notes",
+    ({ data }) => data.lifecycle === "published",
+  );
 
-  return Promise.all(publishedNotes.map(async (note) => {
-    const { Content } = await render(note);
-    return { params: { slug: note.data.slug }, props: { note, Content } };
-  }));
+  return Promise.all(
+    publishedNotes.map(async (note) => {
+      const { Content } = await render(note);
+      return { params: { slug: note.data.slug }, props: { note, Content } };
+    }),
+  );
 }) satisfies GetStaticPaths;
 
 const { note, Content } = Astro.props;
@@ -24,5 +29,10 @@ const { note, Content } = Astro.props;
   publishedDate={note.data.date}
   updatedDate={note.data.updated}
 >
-  <NoteArticle note={note} Content={Content} backHref="/notes/" backLabel="Notes" />
+  <NoteArticle
+    note={note}
+    Content={Content}
+    backHref="/notes/"
+    backLabel="Notes"
+  />
 </BaseLayout>

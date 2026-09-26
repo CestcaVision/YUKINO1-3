@@ -10,7 +10,9 @@ const { title } = Astro.props;
 
 <section class="preview-page" aria-labelledby="page-title">
   <div class="preview-page-copy">
-    <h1 class="page-title" id="page-title">{title}</h1>
+    <h1 class="page-title" id="page-title">
+      {title}
+    </h1>
     <div class="preview-page-message">
       <slot />
     </div>

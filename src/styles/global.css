@@ -9,7 +9,8 @@
   --font-display:
     "Newsreader Variable", "Iowan Old Style", Baskerville, Georgia, serif;
   --font-ui: "Inter Variable", Inter, system-ui, sans-serif;
-  --font-mono: ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
+  --font-mono:
+    ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, monospace;
   --gutter: clamp(1.25rem, 4vw, 4rem);
   --content-width: 94rem;
 }

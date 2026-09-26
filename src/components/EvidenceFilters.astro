@@ -4,24 +4,45 @@ interface Props {
 }
 const { items } = Astro.props;
 const fields = [
-  { name: "subject", label: "Subject", values: items.map((item) => item.subject) },
-  { name: "media", label: "Medium", values: items.flatMap((item) => item.media) },
-  { name: "capabilities", label: "Capability", values: items.flatMap((item) => item.capabilities) },
+  {
+    name: "subject",
+    label: "Subject",
+    values: items.map((item) => item.subject),
+  },
+  {
+    name: "media",
+    label: "Medium",
+    values: items.flatMap((item) => item.media),
+  },
+  {
+    name: "capabilities",
+    label: "Capability",
+    values: items.flatMap((item) => item.capabilities),
+  },
 ];
 ---
 
 <evidence-filters>
-  {items.length > 0 && <form hidden aria-label="Filter published evidence">
-    {fields.map(({ name, label, values }) => <label>{label}
-      <select name={name} aria-label={label}>
-        <option value="">All</option>
-        {[...new Set(values)].sort().map((value) => <option value={value}>{value}</option>)}
-      </select>
-    </label>)}
-    <button type="reset">Clear filters</button>
-  </form>}
+  {items.length > 0 && (
+    <form hidden aria-label="Filter published evidence">
+      {fields.map(({ name, label, values }) => (
+        <label>
+          {label}
+          <select name={name} aria-label={label}>
+            <option value="">All</option>
+            {[...new Set(values)].sort().map((value) => (
+              <option value={value}>{value}</option>
+            ))}
+          </select>
+        </label>
+      ))}
+      <button type="reset">Clear filters</button>
+    </form>
+  )}
   <p role="status" aria-live="polite" aria-atomic="true" hidden></p>
-  <p data-no-matches hidden>No published evidence matches these filters.</p>
+  <p data-no-matches hidden>
+    No published evidence matches these filters.
+  </p>
   {items.length === 0 && <p>No published evidence yet.</p>}
   <slot />
 </evidence-filters>
@@ -32,19 +53,31 @@ const fields = [
       const form = this.querySelector("form");
       if (!form) return;
       const selects = Array.from(form.querySelectorAll("select"));
-      const items = Array.from(this.querySelectorAll<HTMLElement>("[data-evidence-item]"));
-      const groups = this.querySelectorAll<HTMLElement>("[data-evidence-group]");
+      const items = Array.from(
+        this.querySelectorAll<HTMLElement>("[data-evidence-item]"),
+      );
+      const groups = this.querySelectorAll<HTMLElement>(
+        "[data-evidence-group]",
+      );
       const status = this.querySelector<HTMLElement>('[role="status"]')!;
       const empty = this.querySelector<HTMLElement>("[data-no-matches]")!;
       const update = () => {
         for (const item of items) {
-          const values: Record<string, string | string[]> = JSON.parse(item.dataset.evidenceItem!);
-          item.hidden = !selects.every(({ name, value }) =>
-            !value || (Array.isArray(values[name]) ? values[name].includes(value) : values[name] === value),
+          const values: Record<string, string | string[]> = JSON.parse(
+            item.dataset.evidenceItem!,
+          );
+          item.hidden = !selects.every(
+            ({ name, value }) =>
+              !value ||
+              (Array.isArray(values[name])
+                ? values[name].includes(value)
+                : values[name] === value),
           );
         }
         for (const group of groups) {
-          group.hidden = !group.querySelector("[data-evidence-item]:not([hidden])");
+          group.hidden = !group.querySelector(
+            "[data-evidence-item]:not([hidden])",
+          );
         }
         const count = items.filter((item) => !item.hidden).length;
         status.textContent = `${count} ${count === 1 ? "result" : "results"}`;
@@ -53,7 +86,9 @@ const fields = [
       form.addEventListener("submit", (event) => event.preventDefault());
       form.addEventListener("change", update);
       form.addEventListener("reset", () => {
-        selects.forEach((select) => { select.value = ""; });
+        selects.forEach((select) => {
+          select.value = "";
+        });
         update();
       });
       form.hidden = false;
@@ -65,11 +100,39 @@ const fields = [
 </script>
 
 <style>
-  evidence-filters { display: block; }
-  form { display: flex; flex-wrap: wrap; align-items: end; gap: 1rem; padding: 2rem 0 0.5rem; }
-  form[hidden] { display: none; }
-  label { display: grid; gap: 0.5rem; font-size: 0.9rem; max-width: 100%; }
-  select, button { font: inherit; padding: 0.75rem; border: 1px solid var(--color-line); background: var(--color-paper); color: var(--color-ink); max-width: 100%; min-height: 44px; }
-  button { cursor: pointer; }
-  [role="status"] { color: var(--color-muted); }
+  evidence-filters {
+    display: block;
+  }
+  form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    gap: 1rem;
+    padding: 2rem 0 0.5rem;
+  }
+  form[hidden] {
+    display: none;
+  }
+  label {
+    display: grid;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    max-width: 100%;
+  }
+  select,
+  button {
+    font: inherit;
+    padding: 0.75rem;
+    border: 1px solid var(--color-line);
+    background: var(--color-paper);
+    color: var(--color-ink);
+    max-width: 100%;
+    min-height: 44px;
+  }
+  button {
+    cursor: pointer;
+  }
+  [role="status"] {
+    color: var(--color-muted);
+  }
 </style>

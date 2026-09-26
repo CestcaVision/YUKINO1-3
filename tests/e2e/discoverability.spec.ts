@@ -12,7 +12,8 @@ const publishedRoutes: PublishedRoute[] = [
   {
     path: "/",
     pageTitle: "Admissions Portfolio — Technical Preview",
-    description: "Mathematical modelling and computational experiments, explored through completed Work and applicant-authored Notes.",
+    description:
+      "Mathematical modelling and computational experiments, explored through completed Work and applicant-authored Notes.",
     type: "website",
   },
   {
@@ -43,7 +44,8 @@ const publishedRoutes: PublishedRoute[] = [
   {
     path: "/works/fixture-sorting-algorithm-visualiser/",
     pageTitle: "Sorting algorithm visualiser — Admissions Portfolio",
-    description: "An interactive comparison of how common sorting algorithms move data.",
+    description:
+      "An interactive comparison of how common sorting algorithms move data.",
     type: "article",
   },
   {
@@ -56,7 +58,8 @@ const publishedRoutes: PublishedRoute[] = [
   {
     path: "/notes/completing-the-square/",
     pageTitle: "Completing the square, visually — Admissions Portfolio",
-    description: "A geometric route from a quadratic expression to vertex form.",
+    description:
+      "A geometric route from a quadratic expression to vertex form.",
     type: "article",
     updated: "2026-09-10",
   },
@@ -70,14 +73,18 @@ const publishedRoutes: PublishedRoute[] = [
 
 const hiddenSlugs = ["hidden-draft", "hidden-review"];
 
-test("sitemap.xml contains only public stable routes with no draft or review content", async ({ request }) => {
+test("sitemap.xml contains only public stable routes with no draft or review content", async ({
+  request,
+}) => {
   const response = await request.get("/sitemap.xml");
   expect(response.status()).toBe(200);
   expect(response.headers()["content-type"]).toContain("application/xml");
   const body = await response.text();
 
   for (const route of publishedRoutes) {
-    expect(body).toContain(`<loc>https://yukino1-3.github.io${route.path}</loc>`);
+    expect(body).toContain(
+      `<loc>https://yukino1-3.github.io${route.path}</loc>`,
+    );
   }
   for (const slug of hiddenSlugs) {
     expect(body).not.toContain(`/works/${slug}/`);
@@ -88,7 +95,9 @@ test("sitemap.xml contains only public stable routes with no draft or review con
   expect(body.match(/<url>/g)).toHaveLength(publishedRoutes.length);
 });
 
-test("rss.xml aggregates published Work, Notes, and Recent Activity in chronological order", async ({ request }) => {
+test("rss.xml aggregates published Work, Notes, and Recent Activity in chronological order", async ({
+  request,
+}) => {
   const response = await request.get("/rss.xml");
   expect(response.status()).toBe(200);
   // The static file host determines the served Content-Type from the .xml extension;
@@ -96,7 +105,9 @@ test("rss.xml aggregates published Work, Notes, and Recent Activity in chronolog
   expect(response.headers()["content-type"]).toContain("xml");
   const body = await response.text();
 
-  const itemTitles = [...body.matchAll(/<item>\s*<title>([^<]*)<\/title>/g)].map((match) => match[1]);
+  const itemTitles = [
+    ...body.matchAll(/<item>\s*<title>([^<]*)<\/title>/g),
+  ].map((match) => match[1]);
   expect(itemTitles).toEqual([
     "Fixture research presentation",
     "Sorting algorithm visualiser",
@@ -115,7 +126,9 @@ test("rss.xml aggregates published Work, Notes, and Recent Activity in chronolog
 });
 
 for (const route of publishedRoutes) {
-  test(`${route.path} has a matching canonical URL and Open Graph metadata`, async ({ page }) => {
+  test(`${route.path} has a matching canonical URL and Open Graph metadata`, async ({
+    page,
+  }) => {
     await page.goto(route.path);
 
     await expect(page).toHaveTitle(route.pageTitle);
@@ -123,31 +136,52 @@ for (const route of publishedRoutes) {
       "href",
       `https://yukino1-3.github.io${route.path}`,
     );
-    await expect(page.locator('meta[property="og:type"]')).toHaveAttribute("content", route.type);
+    await expect(page.locator('meta[property="og:type"]')).toHaveAttribute(
+      "content",
+      route.type,
+    );
     await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
       "content",
       `https://yukino1-3.github.io${route.path}`,
     );
-    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute("content", route.pageTitle);
-    await expect(page.locator('meta[property="og:description"]')).toHaveAttribute("content", route.description);
-    await expect(page.locator('meta[name="description"]')).toHaveAttribute("content", route.description);
+    await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+      "content",
+      route.pageTitle,
+    );
+    await expect(
+      page.locator('meta[property="og:description"]'),
+    ).toHaveAttribute("content", route.description);
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+      "content",
+      route.description,
+    );
     // Still a technical preview: every route stays noindex until the readiness gate is explicitly lifted.
-    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, nofollow");
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+      "content",
+      "noindex, nofollow",
+    );
   });
 }
 
-for (const route of publishedRoutes.filter((route) => route.type === "article")) {
-  test(`${route.path} publishes an article:published_time${route.updated ? " and article:modified_time" : ""}`, async ({ page }) => {
+for (const route of publishedRoutes.filter(
+  (route) => route.type === "article",
+)) {
+  test(`${route.path} publishes an article:published_time${route.updated ? " and article:modified_time" : ""}`, async ({
+    page,
+  }) => {
     await page.goto(route.path);
-    const publishedTime = await page.locator('meta[property="article:published_time"]').getAttribute("content");
+    const publishedTime = await page
+      .locator('meta[property="article:published_time"]')
+      .getAttribute("content");
     expect(publishedTime).toMatch(/^\d{4}-\d{2}-\d{2}T00:00:00\.000Z$/);
     if (route.updated) {
-      await expect(page.locator('meta[property="article:modified_time"]')).toHaveAttribute(
-        "content",
-        `${route.updated}T00:00:00.000Z`,
-      );
+      await expect(
+        page.locator('meta[property="article:modified_time"]'),
+      ).toHaveAttribute("content", `${route.updated}T00:00:00.000Z`);
     } else {
-      await expect(page.locator('meta[property="article:modified_time"]')).toHaveCount(0);
+      await expect(
+        page.locator('meta[property="article:modified_time"]'),
+      ).toHaveCount(0);
     }
   });
 }
@@ -161,11 +195,21 @@ test("published pages have unique <title> elements", async ({ page }) => {
   expect(new Set(titles).size).toBe(titles.length);
 });
 
-test("the 404 page stays noindex and never masquerades as a successful page", async ({ page }) => {
+test("the 404 page stays noindex and never masquerades as a successful page", async ({
+  page,
+}) => {
   const response = await page.goto("/missing-page/");
   expect(response?.status()).toBe(404);
-  await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", "noindex, nofollow");
+  await expect(page.locator('meta[name="robots"]')).toHaveAttribute(
+    "content",
+    "noindex, nofollow",
+  );
   await expect(page).toHaveTitle("Page not found — Admissions Portfolio");
-  await expect(page.getByRole("heading", { level: 1, name: "Page not found" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Return home" })).toHaveAttribute("href", "/");
+  await expect(
+    page.getByRole("heading", { level: 1, name: "Page not found" }),
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: "Return home" })).toHaveAttribute(
+    "href",
+    "/",
+  );
 });
