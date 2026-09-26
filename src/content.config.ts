@@ -45,11 +45,15 @@ const notes = defineCollection({
       .string()
       .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use a stable kebab-case slug"),
     date: z.coerce.date(),
+    updated: z.coerce.date().optional(),
     lifecycle: z.enum(["draft", "review", "published"]),
     subject: z.enum(noteSubjects),
     media: z.array(z.enum(noteMedia)).min(1),
     capabilities: z.array(z.enum(noteCapabilities)).min(1),
-  }),
+  }).refine(
+    (data) => !data.updated || data.updated >= data.date,
+    { message: "updated must not be before date", path: ["updated"] },
+  ),
 });
 
 const works = defineCollection({
@@ -64,6 +68,7 @@ const works = defineCollection({
       .string()
       .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Use a stable kebab-case slug"),
     date: z.coerce.date(),
+    updated: z.coerce.date().optional(),
     lifecycle: z.enum(["draft", "review", "published"]),
     subject: z.enum(noteSubjects),
     category: z.enum(workCategories),
@@ -80,7 +85,10 @@ const works = defineCollection({
       validation: z.string().trim().min(1),
       limitations: z.string().trim().min(1),
     }),
-  }),
+  }).refine(
+    (data) => !data.updated || data.updated >= data.date,
+    { message: "updated must not be before date", path: ["updated"] },
+  ),
 });
 
 const academicResultLoader = glob({

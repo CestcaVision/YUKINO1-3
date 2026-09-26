@@ -3,6 +3,7 @@ title: Completing the square, visually
 summary: A geometric route from a quadratic expression to vertex form.
 slug: completing-the-square
 date: 2026-09-05
+updated: 2026-09-10
 lifecycle: published
 subject: Mathematics
 media:

@@ -28,6 +28,7 @@ const isIndex = props.kind === "index";
 <BaseLayout
   title={isIndex ? "Draft previews" : props.note.data.title}
   description={isIndex ? "Development-only Note previews." : props.note.data.summary}
+  noindex
 >
   {isIndex ? (
     <section class="notes-index">

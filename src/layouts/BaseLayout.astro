@@ -3,14 +3,21 @@ import "@fontsource-variable/inter";
 import "@fontsource-variable/newsreader";
 import SiteHeader from "../components/SiteHeader.astro";
 import "../styles/global.css";
+import { readyForPublicIndexing, siteName } from "../site-config";
 
 interface Props {
   title: string;
   description: string;
+  type?: "website" | "article";
+  publishedDate?: Date;
+  updatedDate?: Date;
+  noindex?: boolean;
 }
 
-const { title, description } = Astro.props;
-const pageTitle = title === "Home" ? "Admissions Portfolio — Technical Preview" : `${title} — Admissions Portfolio`;
+const { title, description, type = "website", publishedDate, updatedDate, noindex = false } = Astro.props;
+const pageTitle = title === "Home" ? `${siteName} — Technical Preview` : `${title} — ${siteName}`;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const robotsContent = noindex || !readyForPublicIndexing ? "noindex, nofollow" : "index, follow";
 ---
 
 <!doctype html>
@@ -19,8 +26,17 @@ const pageTitle = title === "Home" ? "Admissions Portfolio — Technical Preview
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="description" content={description} />
-    <meta name="robots" content="noindex, nofollow" />
+    <meta name="robots" content={robotsContent} />
     <meta name="theme-color" content="#ffffff" />
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="alternate" type="application/rss+xml" title={siteName} href="/rss.xml" />
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    {publishedDate && <meta property="article:published_time" content={publishedDate.toISOString()} />}
+    {updatedDate && <meta property="article:modified_time" content={updatedDate.toISOString()} />}
     <title>{pageTitle}</title>
   </head>
   <body>

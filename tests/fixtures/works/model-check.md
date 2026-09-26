@@ -3,6 +3,7 @@ title: Fixture model check
 summary: A separate Work used to test evidence navigation.
 slug: fixture-model-check
 date: 2026-08-01
+updated: 2026-08-15
 lifecycle: published
 subject: Mathematics
 category: Computational investigations

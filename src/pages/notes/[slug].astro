@@ -17,6 +17,12 @@ export const getStaticPaths = (async () => {
 const { note, Content } = Astro.props;
 ---
 
-<BaseLayout title={note.data.title} description={note.data.summary}>
+<BaseLayout
+  title={note.data.title}
+  description={note.data.summary}
+  type="article"
+  publishedDate={note.data.date}
+  updatedDate={note.data.updated}
+>
   <NoteArticle note={note} Content={Content} backHref="/notes/" backLabel="Notes" />
 </BaseLayout>
