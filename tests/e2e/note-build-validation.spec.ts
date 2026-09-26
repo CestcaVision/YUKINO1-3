@@ -21,7 +21,11 @@ function buildFixtures() {
   });
 }
 
-function expectBuildFailure(filename: string, content: string, expectedMessage: RegExp) {
+function expectBuildFailure(
+  filename: string,
+  content: string,
+  expectedMessage: RegExp,
+) {
   const fixturePath = join(notesDirectory, filename);
   writeFileSync(fixturePath, content, "utf8");
 
@@ -29,8 +33,14 @@ function expectBuildFailure(filename: string, content: string, expectedMessage: 
     buildFixtures();
     throw new Error("Expected build to fail");
   } catch (error) {
-    const failure = error as { stdout?: string; stderr?: string; message: string };
-    const output = stripAnsi(`${failure.stdout ?? ""}\n${failure.stderr ?? ""}\n${failure.message}`);
+    const failure = error as {
+      stdout?: string;
+      stderr?: string;
+      message: string;
+    };
+    const output = stripAnsi(
+      `${failure.stdout ?? ""}\n${failure.stderr ?? ""}\n${failure.message}`,
+    );
     expect(output).toMatch(expectedMessage);
   } finally {
     rmSync(fixturePath, { force: true });
@@ -122,7 +132,9 @@ test("MDX files fail instead of entering or bypassing the collection", () => {
   );
 });
 
-test("changing a title preserves the explicit stable slug in browser output", async ({ page }) => {
+test("changing a title preserves the explicit stable slug in browser output", async ({
+  page,
+}) => {
   const notePath = join(notesDirectory, "completing-the-square.md");
   const originalNote = readFileSync(notePath, "utf8");
   const renamedTitle = "A new title for the same Note";
@@ -130,13 +142,18 @@ test("changing a title preserves the explicit stable slug in browser output", as
   try {
     writeFileSync(
       notePath,
-      originalNote.replace("title: Completing the square, visually", `title: ${renamedTitle}`),
+      originalNote.replace(
+        "title: Completing the square, visually",
+        `title: ${renamedTitle}`,
+      ),
       "utf8",
     );
     buildFixtures();
 
     await page.goto("/notes/completing-the-square/");
-    await expect(page.getByRole("heading", { level: 1, name: renamedTitle })).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 1, name: renamedTitle }),
+    ).toBeVisible();
     await expect(page).toHaveURL(/\/notes\/completing-the-square\/$/);
   } finally {
     writeFileSync(notePath, originalNote, "utf8");

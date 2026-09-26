@@ -18,10 +18,20 @@ const points = [
   xmlns="http://www.w3.org/2000/svg"
 >
   <path class="plot-axis" d="M10 47H92M55 8V82"></path>
-  <path class="plot-tick" d="M15 44V50M34 44V50M76 44V50M52 20H58M52 67H58"></path>
+  <path
+    class="plot-tick"
+    d="M15 44V50M34 44V50M76 44V50M52 20H58M52 67H58"
+  ></path>
   {points.map(([x, y]) => (
-    <path class="plot-point" d={`M${x - 1.4} ${y}h2.8M${x} ${y - 1.4}v2.8`}></path>
+    <path
+      class="plot-point"
+      d={`M${x - 1.4} ${y}h2.8M${x} ${y - 1.4}v2.8`}
+    ></path>
   ))}
-  <text class="plot-label" x="94" y="50">x</text>
-  <text class="plot-label" x="52" y="6">y</text>
+  <text class="plot-label" x="94" y="50">
+    x
+  </text>
+  <text class="plot-label" x="52" y="6">
+    y
+  </text>
 </svg>

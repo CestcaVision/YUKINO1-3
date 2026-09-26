@@ -21,7 +21,10 @@ const isCurrent = (href: string) =>
     <ul>
       {links.map((link) => (
         <li>
-          <a href={link.href} aria-current={isCurrent(link.href) ? "page" : undefined}>
+          <a
+            href={link.href}
+            aria-current={isCurrent(link.href) ? "page" : undefined}
+          >
             {link.label}
           </a>
         </li>
@@ -32,12 +35,17 @@ const isCurrent = (href: string) =>
   <span class="profile-state">Profile pending</span>
 
   <details class="mobile-menu">
-    <summary aria-label="Open navigation menu" role="button"><span>Menu</span></summary>
+    <summary aria-label="Open navigation menu" role="button">
+      <span>Menu</span>
+    </summary>
     <nav aria-label="Mobile">
       <ul>
         {links.map((link) => (
           <li>
-            <a href={link.href} aria-current={isCurrent(link.href) ? "page" : undefined}>
+            <a
+              href={link.href}
+              aria-current={isCurrent(link.href) ? "page" : undefined}
+            >
               {link.label}
             </a>
           </li>

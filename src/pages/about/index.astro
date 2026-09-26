@@ -8,24 +8,50 @@ import { z } from "astro/zod";
 const currentStudy = z.array(z.string().trim().min(1)).parse(currentStudyData);
 ---
 
-<BaseLayout title="About" description="Identity details are pending for this technical preview.">
+<BaseLayout
+  title="About"
+  description="Identity details are pending for this technical preview."
+>
   <PreviewPage title="About">
     <p class="preview-lead">Profile pending</p>
-    <p>Verified identity and contact details will be added before public launch.</p>
+    <p>
+      Verified identity and contact details will be added before public launch.
+    </p>
   </PreviewPage>
   {currentStudy.length > 0 && (
     <section class="current-study" aria-labelledby="current-study">
       <h2 id="current-study">Current study</h2>
-      <p>These are current studies, not examination results or official predictions.</p>
-      <ul>{currentStudy.map((subject) => <li>{subject}</li>)}</ul>
+      <p>
+        These are current studies, not examination results or official
+        predictions.
+      </p>
+      <ul>
+        {currentStudy.map((subject) => (
+          <li>{subject}</li>
+        ))}
+      </ul>
     </section>
   )}
   <AcademicResults />
 </BaseLayout>
 
 <style>
-  .current-study { border-top: 1px solid var(--color-line); padding: 2rem 0; }
-  h2 { font-size: 1.15rem; font-weight: 600; margin: 0 0 1rem; }
-  p, li { font-size: 0.95rem; line-height: 1.5; overflow-wrap: anywhere; }
-  p { color: var(--color-muted); }
+  .current-study {
+    border-top: 1px solid var(--color-line);
+    padding: 2rem 0;
+  }
+  h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 0 0 1rem;
+  }
+  p,
+  li {
+    font-size: 0.95rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+  p {
+    color: var(--color-muted);
+  }
 </style>

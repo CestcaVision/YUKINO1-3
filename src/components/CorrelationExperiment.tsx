@@ -109,25 +109,30 @@ export default function CorrelationExperiment() {
   // SVG segment is geometrically accurate even for steep slopes.
   const clamp = (v: number) => Math.max(0, Math.min(1, v));
   const yAtX = (x: number) => slope * x + intercept;
-  const xAtY = (y: number) => slope === 0 ? 0 : (y - intercept) / slope;
+  const xAtY = (y: number) => (slope === 0 ? 0 : (y - intercept) / slope);
   // Find the two boundary intersections and keep the ones inside [0,1]×[0,1].
   const candidates: [number, number][] = [
     [0, yAtX(0)],
     [1, yAtX(1)],
     [xAtY(0), 0],
     [xAtY(1), 1],
-  ].filter(([x, y]) => x >= 0 && x <= 1 && y >= 0 && y <= 1) as [number, number][];
+  ].filter(([x, y]) => x >= 0 && x <= 1 && y >= 0 && y <= 1) as [
+    number,
+    number,
+  ][];
   const x0 = candidates.length >= 2 ? candidates[0][0] : 0;
   const y0 = candidates.length >= 2 ? candidates[0][1] : clamp(intercept);
   const x1 = candidates.length >= 2 ? candidates[candidates.length - 1][0] : 1;
-  const y1 = candidates.length >= 2 ? candidates[candidates.length - 1][1] : clamp(slope + intercept);
+  const y1 =
+    candidates.length >= 2
+      ? candidates[candidates.length - 1][1]
+      : clamp(slope + intercept);
 
   const rStr = r.toFixed(3);
   const magnitude = Math.abs(r);
   const strength =
     magnitude >= 0.7 ? "strong" : magnitude >= 0.4 ? "moderate" : "weak";
-  const direction =
-    r > 0.1 ? "positive" : r < -0.1 ? "negative" : "near-zero";
+  const direction = r > 0.1 ? "positive" : r < -0.1 ? "negative" : "near-zero";
   const sign = intercept >= 0 ? "+" : "−";
   const slopeStr = slope.toFixed(2);
   const intStr = Math.abs(intercept).toFixed(2);
@@ -269,9 +274,9 @@ export default function CorrelationExperiment() {
       </svg>
 
       <p className="correlation-summary" aria-live="polite">
-        <strong>r = {rStr}</strong> ({strength} {direction} association).{" "}
-        ŷ = {slopeStr}x {sign} {intStr}.{" "}
-        {data.length} point{data.length !== 1 ? "s" : ""}.
+        <strong>r = {rStr}</strong> ({strength} {direction} association). ŷ ={" "}
+        {slopeStr}x {sign} {intStr}. {data.length} point
+        {data.length !== 1 ? "s" : ""}.
         {outlierCount > 0 &&
           ` ${outlierCount} outlier${outlierCount !== 1 ? "s" : ""} (orange).`}
         {confound && " Confounder active: data splits into two groups."}

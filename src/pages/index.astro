@@ -4,20 +4,49 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import AcademicResults from "../components/AcademicResults.astro";
 import { getCollection } from "astro:content";
 
-const works = await getCollection("works", ({ data }) => data.lifecycle === "published");
-const notes = await getCollection("notes", ({ data }) => data.lifecycle === "published");
-const milestones = await getCollection("milestones", ({ data }) => data.lifecycle === "published");
+const works = await getCollection(
+  "works",
+  ({ data }) => data.lifecycle === "published",
+);
+const notes = await getCollection(
+  "notes",
+  ({ data }) => data.lifecycle === "published",
+);
+const milestones = await getCollection(
+  "milestones",
+  ({ data }) => data.lifecycle === "published",
+);
 const evidence = [
-  ...works.map(({ data }) => ({ ...data, kind: "Work", href: `/works/${data.slug}/` })),
-  ...notes.map(({ data }) => ({ ...data, kind: "Note", href: `/notes/${data.slug}/` })),
-].sort((a, b) => b.date.valueOf() - a.date.valueOf() || a.href.localeCompare(b.href));
+  ...works.map(({ data }) => ({
+    ...data,
+    kind: "Work",
+    href: `/works/${data.slug}/`,
+  })),
+  ...notes.map(({ data }) => ({
+    ...data,
+    kind: "Note",
+    href: `/notes/${data.slug}/`,
+  })),
+].sort(
+  (a, b) => b.date.valueOf() - a.date.valueOf() || a.href.localeCompare(b.href),
+);
 // Feature the most recently published Work; no inferred claim of quality or ranking.
 const featuredWork = evidence.find((item) => item.kind === "Work");
 const latestNote = evidence.find((item) => item.kind === "Note");
 const activity = [
   ...evidence,
-  ...milestones.map(({ id, data }) => ({ ...data, kind: "Milestone", href: "", id })),
-].sort((a, b) => b.date.valueOf() - a.date.valueOf() || a.title.localeCompare(b.title) || a.kind.localeCompare(b.kind));
+  ...milestones.map(({ id, data }) => ({
+    ...data,
+    kind: "Milestone",
+    href: "",
+    id,
+  })),
+].sort(
+  (a, b) =>
+    b.date.valueOf() - a.date.valueOf() ||
+    a.title.localeCompare(b.title) ||
+    a.kind.localeCompare(b.kind),
+);
 ---
 
 <BaseLayout
@@ -26,8 +55,14 @@ const activity = [
 >
   <section class="hero" aria-labelledby="hero-title">
     <div class="hero-copy">
-      <h1 id="hero-title">Exploring ideas through mathematics and computation.</h1>
-      <p>Mathematical modelling and computational experiments: making ideas precise, testing how they behave, and explaining what the evidence shows.</p>
+      <h1 id="hero-title">
+        Exploring ideas through mathematics and computation.
+      </h1>
+      <p>
+        Mathematical modelling and computational experiments: making ideas
+        precise, testing how they behave, and explaining what the evidence
+        shows.
+      </p>
     </div>
     <div class="hero-plot">
       <PlotMotif />
@@ -35,35 +70,92 @@ const activity = [
   </section>
 
   {[
-    { id: "featured-work", title: "Featured Work", item: featuredWork, href: "/works/", link: "Explore Works" },
-    { id: "latest-note", title: "Latest Note", item: latestNote, href: "/notes/", link: "Explore Notes" },
-  ].map(({ id, title, item, href, link }) => <section class="evidence-section" aria-labelledby={id}>
-    <h2 id={id}>{title}</h2>
-    <div class="home-evidence">
-      {item ? <article>
-        <p class="note-meta">{item.subject}</p>
-        <h3><a href={item.href}>{item.title}</a></h3>
-        <p>{item.summary}</p>
-      </article> : <p>No published {title === "Featured Work" ? "Work" : "Note"} yet.</p>}
-      <a href={href}>{link}</a>
-    </div>
-  </section>)}
+    {
+      id: "featured-work",
+      title: "Featured Work",
+      item: featuredWork,
+      href: "/works/",
+      link: "Explore Works",
+    },
+    {
+      id: "latest-note",
+      title: "Latest Note",
+      item: latestNote,
+      href: "/notes/",
+      link: "Explore Notes",
+    },
+  ].map(({ id, title, item, href, link }) => (
+    <section class="evidence-section" aria-labelledby={id}>
+      <h2 id={id}>{title}</h2>
+      <div class="home-evidence">
+        {item ? (
+          <article>
+            <p class="note-meta">{item.subject}</p>
+            <h3>
+              <a href={item.href}>{item.title}</a>
+            </h3>
+            <p>{item.summary}</p>
+          </article>
+        ) : (
+          <p>No published {title === "Featured Work" ? "Work" : "Note"} yet.</p>
+        )}
+        <a href={href}>{link}</a>
+      </div>
+    </section>
+  ))}
 
   <section class="activity-section" aria-labelledby="activity-title">
     <h2 id="activity-title">Recent activity</h2>
-    {activity.length > 0 ? <ol class="activity-list">{activity.map((item) => <li>
-      <div class="note-meta"><time datetime={item.date.toISOString()}>{item.date.toLocaleDateString("en-GB", { dateStyle: "long", timeZone: "UTC" })}</time><span>{item.kind}</span></div>
-      <h3>{item.href ? <a href={item.href}>{item.title}</a> : item.title}</h3>
-      <p>{item.summary}</p>
-    </li>)}</ol> : <p>No published activity yet.</p>}
+    {activity.length > 0 ? (
+      <ol class="activity-list">
+        {activity.map((item) => (
+          <li>
+            <div class="note-meta">
+              <time datetime={item.date.toISOString()}>
+                {item.date.toLocaleDateString("en-GB", {
+                  dateStyle: "long",
+                  timeZone: "UTC",
+                })}
+              </time>
+              <span>{item.kind}</span>
+            </div>
+            <h3>
+              {item.href ? <a href={item.href}>{item.title}</a> : item.title}
+            </h3>
+            <p>{item.summary}</p>
+          </li>
+        ))}
+      </ol>
+    ) : (
+      <p>No published activity yet.</p>
+    )}
   </section>
   <AcademicResults snapshot />
 </BaseLayout>
 
 <style>
-  .home-evidence h3, .activity-list h3 { font-family: var(--font-display); font-weight: 500; font-size: clamp(1.5rem, 3vw, 2.5rem); margin: 1rem 0; }
-  .home-evidence p, .activity-list p { line-height: 1.65; }
-  .activity-list { list-style: none; padding: 0; margin: 0; }
-  .activity-list li + li { border-top: 1px solid var(--color-line); margin-top: 2rem; padding-top: 2rem; }
-  .note-meta { flex-wrap: wrap; }
+  .home-evidence h3,
+  .activity-list h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    margin: 1rem 0;
+  }
+  .home-evidence p,
+  .activity-list p {
+    line-height: 1.65;
+  }
+  .activity-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .activity-list li + li {
+    border-top: 1px solid var(--color-line);
+    margin-top: 2rem;
+    padding-top: 2rem;
+  }
+  .note-meta {
+    flex-wrap: wrap;
+  }
 </style>

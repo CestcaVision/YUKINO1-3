@@ -3,35 +3,52 @@ import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import EvidenceFilters from "../../components/EvidenceFilters.astro";
 
-const notes = (await getCollection("notes", ({ data }) => data.lifecycle === "published")).sort(
-  (left, right) => right.data.date.valueOf() - left.data.date.valueOf(),
-);
+const notes = (
+  await getCollection("notes", ({ data }) => data.lifecycle === "published")
+).sort((left, right) => right.data.date.valueOf() - left.data.date.valueOf());
 const showDrafts = import.meta.env.DEV;
 ---
 
-<BaseLayout title="Notes" description="Applicant-authored explanations of academic ideas.">
+<BaseLayout
+  title="Notes"
+  description="Applicant-authored explanations of academic ideas."
+>
   <section class="notes-index">
     <header class="notes-heading">
       <p class="eyebrow">Academic writing</p>
       <h1 class="page-title">Notes</h1>
       <p>Applicant-authored explanations, published only after review.</p>
-      {showDrafts && <a class="draft-preview-link" href="/notes/drafts/">Preview drafts</a>}
+      {showDrafts && (
+        <a class="draft-preview-link" href="/notes/drafts/">
+          Preview drafts
+        </a>
+      )}
     </header>
     <EvidenceFilters items={notes.map(({ data }) => data)}>
-    <ol class="note-list">
-      {notes.map(({ data }) => (
-        <li data-evidence-item={JSON.stringify({ subject: data.subject, media: data.media, capabilities: data.capabilities })}>
-          <article>
-            <div class="note-meta">
-              <time datetime={data.date.toISOString()}>{data.date.toLocaleDateString("en-GB", { dateStyle: "long" })}</time>
-              <span>{data.subject}</span>
-            </div>
-            <h2><a href={`/notes/${data.slug}/`}>{data.title}</a></h2>
-            <p>{data.summary}</p>
-          </article>
-        </li>
-      ))}
-    </ol>
+      <ol class="note-list">
+        {notes.map(({ data }) => (
+          <li
+            data-evidence-item={JSON.stringify({
+              subject: data.subject,
+              media: data.media,
+              capabilities: data.capabilities,
+            })}
+          >
+            <article>
+              <div class="note-meta">
+                <time datetime={data.date.toISOString()}>
+                  {data.date.toLocaleDateString("en-GB", { dateStyle: "long" })}
+                </time>
+                <span>{data.subject}</span>
+              </div>
+              <h2>
+                <a href={`/notes/${data.slug}/`}>{data.title}</a>
+              </h2>
+              <p>{data.summary}</p>
+            </article>
+          </li>
+        ))}
+      </ol>
     </EvidenceFilters>
   </section>
 </BaseLayout>

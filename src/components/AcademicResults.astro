@@ -6,35 +6,62 @@ interface Props {
 }
 
 const { snapshot = false } = Astro.props;
-const results = (await getCollection("academicResults", ({ data }) =>
-  data.evidenceChecked && data.public,
-)).sort((a, b) => b.data.effectiveDate.localeCompare(a.data.effectiveDate) || a.id.localeCompare(b.id));
+const results = (
+  await getCollection(
+    "academicResults",
+    ({ data }) => data.evidenceChecked && data.public,
+  )
+).sort(
+  (a, b) =>
+    b.data.effectiveDate.localeCompare(a.data.effectiveDate) ||
+    a.id.localeCompare(b.id),
+);
 const displayedResults = snapshot ? results.slice(0, 3) : results;
 const heading = snapshot ? "Academic Snapshot" : "Academic Results";
 const headingId = snapshot ? "academic-snapshot" : "academic-results";
 const dateFormat = new Intl.DateTimeFormat("en-GB", {
-  day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
+  day: "numeric",
+  month: "long",
+  year: "numeric",
+  timeZone: "UTC",
 });
 ---
 
 {(!snapshot || displayedResults.length > 0) && (
   <section class="academic-results" aria-labelledby={headingId}>
     <h2 id={headingId}>{heading}</h2>
-    {displayedResults.length === 0 ? <p>No verified Academic Results are published yet.</p> : <ul>
-      {displayedResults.map(({ data }) => (
-        <li>
-          <h3>{data.qualification}{data.subject && ` · ${data.subject}`}</h3>
-          <p class="academic-result-value">
-            {data.status === "predicted" ? "Officially predicted" : "Achieved"}: {data.result}
-          </p>
-          <p class="academic-result-context">{data.awardingBody} · {data.examinationSession}</p>
-          <p class="academic-result-context">
-            Effective <time datetime={data.effectiveDate}>{dateFormat.format(new Date(data.effectiveDate))}</time>
-          </p>
-        </li>
-      ))}
-    </ul>}
-    {snapshot && <a href="/about/#academic-results">View all Academic Results</a>}
+    {displayedResults.length === 0 ? (
+      <p>No verified Academic Results are published yet.</p>
+    ) : (
+      <ul>
+        {displayedResults.map(({ data }) => (
+          <li>
+            <h3>
+              {data.qualification}
+              {data.subject && ` · ${data.subject}`}
+            </h3>
+            <p class="academic-result-value">
+              {data.status === "predicted"
+                ? "Officially predicted"
+                : "Achieved"}
+              : {data.result}
+            </p>
+            <p class="academic-result-context">
+              {data.awardingBody} · {data.examinationSession}
+            </p>
+            <p class="academic-result-context">
+              Effective{" "}
+              <time datetime={data.effectiveDate}>
+                {dateFormat.format(new Date(data.effectiveDate))}
+              </time>
+            </p>
+          </li>
+        ))}
+      </ul>
+    )}
+    {snapshot && (
+      <a href="/about/#academic-results">View all Academic Results</a>
+    )}
   </section>
 )}
 
@@ -43,12 +70,41 @@ const dateFormat = new Intl.DateTimeFormat("en-GB", {
     border-top: 1px solid var(--color-line);
     padding: 2rem 0;
   }
-  h2 { font-size: 1.15rem; font-weight: 600; margin: 0 0 1.25rem; }
-  ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 1.25rem; }
-  li { max-width: 42rem; overflow-wrap: anywhere; }
-  h3 { font-size: 0.95rem; font-weight: 600; margin: 0; }
-  p { margin: 0.35rem 0 0; line-height: 1.5; }
-  .academic-result-value { font-size: 0.95rem; }
-  .academic-result-context { color: var(--color-muted); font-size: 0.8rem; }
-  a { display: inline-block; margin-top: 1.25rem; font-size: 0.85rem; }
+  h2 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin: 0 0 1.25rem;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 1.25rem;
+  }
+  li {
+    max-width: 42rem;
+    overflow-wrap: anywhere;
+  }
+  h3 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0;
+  }
+  p {
+    margin: 0.35rem 0 0;
+    line-height: 1.5;
+  }
+  .academic-result-value {
+    font-size: 0.95rem;
+  }
+  .academic-result-context {
+    color: var(--color-muted);
+    font-size: 0.8rem;
+  }
+  a {
+    display: inline-block;
+    margin-top: 1.25rem;
+    font-size: 0.85rem;
+  }
 </style>

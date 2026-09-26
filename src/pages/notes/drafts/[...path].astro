@@ -8,17 +8,23 @@ import BaseLayout from "../../../layouts/BaseLayout.astro";
 export const getStaticPaths = (async () => {
   if (!import.meta.env.DEV) return [];
 
-  const drafts = (await getCollection("notes", ({ data }) => data.lifecycle !== "published")).sort(
-    (left, right) => right.data.date.valueOf() - left.data.date.valueOf(),
-  );
+  const drafts = (
+    await getCollection("notes", ({ data }) => data.lifecycle !== "published")
+  ).sort((left, right) => right.data.date.valueOf() - left.data.date.valueOf());
   const detailPaths = await Promise.all(
     drafts.map(async (note) => {
       const { Content } = await render(note);
-      return { params: { path: note.data.slug }, props: { kind: "detail" as const, note, Content } };
+      return {
+        params: { path: note.data.slug },
+        props: { kind: "detail" as const, note, Content },
+      };
     }),
   );
 
-  return [{ params: { path: undefined }, props: { kind: "index" as const, drafts } }, ...detailPaths];
+  return [
+    { params: { path: undefined }, props: { kind: "index" as const, drafts } },
+    ...detailPaths,
+  ];
 }) satisfies GetStaticPaths;
 
 const props = Astro.props;
@@ -27,7 +33,9 @@ const isIndex = props.kind === "index";
 
 <BaseLayout
   title={isIndex ? "Draft previews" : props.note.data.title}
-  description={isIndex ? "Development-only Note previews." : props.note.data.summary}
+  description={
+    isIndex ? "Development-only Note previews." : props.note.data.summary
+  }
   noindex
 >
   {isIndex ? (
@@ -35,15 +43,25 @@ const isIndex = props.kind === "index";
       <header class="notes-heading">
         <p class="draft-badge">Development only</p>
         <h1 class="page-title">Draft previews</h1>
-        <p>Draft and review Notes are visible here locally, but are never emitted by a production build.</p>
-        <a class="note-back" href="/notes/">Back to published Notes</a>
+        <p>
+          Draft and review Notes are visible here locally, but are never emitted
+          by a production build.
+        </p>
+        <a class="note-back" href="/notes/">
+          Back to published Notes
+        </a>
       </header>
       <ol class="note-list">
         {props.drafts.map(({ data }) => (
           <li>
             <article>
-              <div class="note-meta"><span>{data.lifecycle}</span><span>{data.subject}</span></div>
-              <h2><a href={`/notes/drafts/${data.slug}/`}>{data.title}</a></h2>
+              <div class="note-meta">
+                <span>{data.lifecycle}</span>
+                <span>{data.subject}</span>
+              </div>
+              <h2>
+                <a href={`/notes/drafts/${data.slug}/`}>{data.title}</a>
+              </h2>
               <p>{data.summary}</p>
             </article>
           </li>

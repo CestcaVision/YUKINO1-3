@@ -3,31 +3,100 @@ import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import EvidenceFilters from "../../components/EvidenceFilters.astro";
 
-const works = (await getCollection("works", ({ data }) => data.lifecycle === "published")).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
-const notes = await getCollection("notes", ({ data }) => data.lifecycle === "published");
+const works = (
+  await getCollection("works", ({ data }) => data.lifecycle === "published")
+).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const notes = await getCollection(
+  "notes",
+  ({ data }) => data.lifecycle === "published",
+);
 const evidence = [
-  ...works.map((work) => ({ title: work.data.title, href: `/works/${work.data.slug}/`, capabilities: work.data.capabilities })),
-  ...notes.map((note) => ({ title: note.data.title, href: `/notes/${note.data.slug}/`, capabilities: note.data.capabilities })),
+  ...works.map((work) => ({
+    title: work.data.title,
+    href: `/works/${work.data.slug}/`,
+    capabilities: work.data.capabilities,
+  })),
+  ...notes.map((note) => ({
+    title: note.data.title,
+    href: `/notes/${note.data.slug}/`,
+    capabilities: note.data.capabilities,
+  })),
 ];
-const capabilities = [...new Set(evidence.flatMap((item) => item.capabilities))];
+const capabilities = [
+  ...new Set(evidence.flatMap((item) => item.capabilities)),
+];
 const categories = [...new Set(works.map((work) => work.data.category))];
 ---
 
-<BaseLayout title="Works" description="Completed Work and its evidence-backed Case Studies.">
+<BaseLayout
+  title="Works"
+  description="Completed Work and its evidence-backed Case Studies."
+>
   <section class="works-index">
-    <header class="notes-heading"><p class="eyebrow">Completed evidence</p><h1 class="page-title">Works</h1><p>Completed or substantially demonstrable Work, documented through full Case Studies.</p></header>
+    <header class="notes-heading">
+      <p class="eyebrow">Completed evidence</p>
+      <h1 class="page-title">Works</h1>
+      <p>
+        Completed or substantially demonstrable Work, documented through full
+        Case Studies.
+      </p>
+    </header>
     <EvidenceFilters items={works.map(({ data }) => data)}>
-    {categories.map((category) => <section class="work-category" data-evidence-group>
-      <h2>{category}</h2>
-      <ol class="note-list">{works.filter((work) => work.data.category === category).map(({ data }) => <li data-evidence-item={JSON.stringify({ subject: data.subject, media: data.media, capabilities: data.capabilities })}><article>
-        <div class="note-meta"><time datetime={data.date.toISOString()}>{data.date.toLocaleDateString("en-GB", { dateStyle: "long" })}</time><span>{data.subject}</span></div>
-        <h3><a href={`/works/${data.slug}/`}>{data.title}</a></h3><p>{data.summary}</p>
-      </article></li>)}</ol>
-    </section>)}
+      {categories.map((category) => (
+        <section class="work-category" data-evidence-group>
+          <h2>{category}</h2>
+          <ol class="note-list">
+            {works
+              .filter((work) => work.data.category === category)
+              .map(({ data }) => (
+                <li
+                  data-evidence-item={JSON.stringify({
+                    subject: data.subject,
+                    media: data.media,
+                    capabilities: data.capabilities,
+                  })}
+                >
+                  <article>
+                    <div class="note-meta">
+                      <time datetime={data.date.toISOString()}>
+                        {data.date.toLocaleDateString("en-GB", {
+                          dateStyle: "long",
+                        })}
+                      </time>
+                      <span>{data.subject}</span>
+                    </div>
+                    <h3>
+                      <a href={`/works/${data.slug}/`}>{data.title}</a>
+                    </h3>
+                    <p>{data.summary}</p>
+                  </article>
+                </li>
+              ))}
+          </ol>
+        </section>
+      ))}
     </EvidenceFilters>
-    {capabilities.length > 0 && <section class="capabilities" aria-labelledby="capabilities-title">
-      <p class="eyebrow">Evidence map</p><h2 id="capabilities-title">Capabilities</h2>
-      <div class="capability-list">{capabilities.map((capability) => <article><h3>{capability}</h3><ul>{evidence.filter((item) => item.capabilities.includes(capability)).map((item) => <li><a href={item.href}>{item.title}</a></li>)}</ul></article>)}</div>
-    </section>}
+    {capabilities.length > 0 && (
+      <section class="capabilities" aria-labelledby="capabilities-title">
+        <p class="eyebrow">Evidence map</p>
+        <h2 id="capabilities-title">Capabilities</h2>
+        <div class="capability-list">
+          {capabilities.map((capability) => (
+            <article>
+              <h3>{capability}</h3>
+              <ul>
+                {evidence
+                  .filter((item) => item.capabilities.includes(capability))
+                  .map((item) => (
+                    <li>
+                      <a href={item.href}>{item.title}</a>
+                    </li>
+                  ))}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </section>
+    )}
   </section>
 </BaseLayout>

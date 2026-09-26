@@ -9,7 +9,10 @@ async function loadExperiment(page: Page) {
 
 async function setRange(page: Page, id: string, value: number) {
   await page.locator(id).evaluate((el: HTMLInputElement, val: string) => {
-    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")!.set!.call(el, val);
+    Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      "value",
+    )!.set!.call(el, val);
     el.dispatchEvent(new Event("input", { bubbles: true }));
     el.dispatchEvent(new Event("change", { bubbles: true }));
   }, String(value));

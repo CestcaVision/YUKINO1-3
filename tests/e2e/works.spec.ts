@@ -21,7 +21,9 @@ test("a published Work appears in the index and as a complete Case Study", async
   await expect(page.getByText(/coming soon/i)).toHaveCount(0);
 
   await workLink.click();
-  await expect(page).toHaveURL(/\/works\/fixture-sorting-algorithm-visualiser\/$/);
+  await expect(page).toHaveURL(
+    /\/works\/fixture-sorting-algorithm-visualiser\/$/,
+  );
   for (const heading of [
     "Problem",
     "Hypothesis",
@@ -41,7 +43,9 @@ test("a published Work appears in the index and as a complete Case Study", async
   await expect(
     page.getByText("Comparing positions 1 and 2", { exact: true }),
   ).toBeVisible();
-  await page.getByRole("combobox", { name: "Algorithm" }).selectOption("insertion");
+  await page
+    .getByRole("combobox", { name: "Algorithm" })
+    .selectOption("insertion");
   await expect(page.getByText("Step 0 of 7", { exact: true })).toBeVisible();
 });
 
@@ -67,12 +71,10 @@ test("Capabilities appear only with links to published evidence", async ({
   });
   await expect(interpretsCapability).toBeVisible();
   await expect(
-    interpretsCapability
-      .locator("..")
-      .getByRole("link", {
-        name: "Correlation and regression experiment",
-        exact: true,
-      }),
+    interpretsCapability.locator("..").getByRole("link", {
+      name: "Correlation and regression experiment",
+      exact: true,
+    }),
   ).toBeVisible();
 });
 

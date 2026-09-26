@@ -32,11 +32,23 @@ export const GET: APIRoute = async ({ site }) => {
   const items: FeedItem[] = [
     ...works.map((work) => {
       const link = new URL(`works/${work.data.slug}/`, base).href;
-      return { title: work.data.title, summary: work.data.summary, date: work.data.date, link, guid: link };
+      return {
+        title: work.data.title,
+        summary: work.data.summary,
+        date: work.data.date,
+        link,
+        guid: link,
+      };
     }),
     ...notes.map((note) => {
       const link = new URL(`notes/${note.data.slug}/`, base).href;
-      return { title: note.data.title, summary: note.data.summary, date: note.data.date, link, guid: link };
+      return {
+        title: note.data.title,
+        summary: note.data.summary,
+        date: note.data.date,
+        link,
+        guid: link,
+      };
     }),
     ...milestones.map((milestone) => ({
       title: milestone.data.title,

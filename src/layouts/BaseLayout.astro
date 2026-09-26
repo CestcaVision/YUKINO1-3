@@ -14,10 +14,21 @@ interface Props {
   noindex?: boolean;
 }
 
-const { title, description, type = "website", publishedDate, updatedDate, noindex = false } = Astro.props;
-const pageTitle = title === "Home" ? `${siteName} — Technical Preview` : `${title} — ${siteName}`;
+const {
+  title,
+  description,
+  type = "website",
+  publishedDate,
+  updatedDate,
+  noindex = false,
+} = Astro.props;
+const pageTitle =
+  title === "Home"
+    ? `${siteName} — Technical Preview`
+    : `${title} — ${siteName}`;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
-const robotsContent = noindex || !readyForPublicIndexing ? "noindex, nofollow" : "index, follow";
+const robotsContent =
+  noindex || !readyForPublicIndexing ? "noindex, nofollow" : "index, follow";
 ---
 
 <!doctype html>
@@ -29,18 +40,35 @@ const robotsContent = noindex || !readyForPublicIndexing ? "noindex, nofollow" :
     <meta name="robots" content={robotsContent} />
     <meta name="theme-color" content="#ffffff" />
     <link rel="canonical" href={canonicalURL} />
-    <link rel="alternate" type="application/rss+xml" title={siteName} href="/rss.xml" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={siteName}
+      href="/rss.xml"
+    />
     <meta property="og:type" content={type} />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
-    {publishedDate && <meta property="article:published_time" content={publishedDate.toISOString()} />}
-    {updatedDate && <meta property="article:modified_time" content={updatedDate.toISOString()} />}
+    {publishedDate && (
+      <meta
+        property="article:published_time"
+        content={publishedDate.toISOString()}
+      />
+    )}
+    {updatedDate && (
+      <meta
+        property="article:modified_time"
+        content={updatedDate.toISOString()}
+      />
+    )}
     <title>{pageTitle}</title>
   </head>
   <body>
-    <a class="skip-link" href="#content">Skip to content</a>
+    <a class="skip-link" href="#content">
+      Skip to content
+    </a>
     <div class="page-shell">
       <SiteHeader />
       <main id="content" tabindex="-1">

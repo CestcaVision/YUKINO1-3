@@ -18,8 +18,14 @@ export const GET: APIRoute = async ({ site }) => {
     { path: "works/" },
     { path: "notes/" },
     { path: "about/" },
-    ...works.map((work) => ({ path: `works/${work.data.slug}/`, lastmod: work.data.updated ?? work.data.date })),
-    ...notes.map((note) => ({ path: `notes/${note.data.slug}/`, lastmod: note.data.updated ?? note.data.date })),
+    ...works.map((work) => ({
+      path: `works/${work.data.slug}/`,
+      lastmod: work.data.updated ?? work.data.date,
+    })),
+    ...notes.map((note) => ({
+      path: `notes/${note.data.slug}/`,
+      lastmod: note.data.updated ?? note.data.date,
+    })),
   ];
 
   const body = `<?xml version="1.0" encoding="UTF-8"?>
@@ -27,7 +33,9 @@ export const GET: APIRoute = async ({ site }) => {
 ${urls
   .map(({ path, lastmod }) => {
     const loc = new URL(path, base).href;
-    const lastmodTag = lastmod ? `<lastmod>${lastmod.toISOString().slice(0, 10)}</lastmod>` : "";
+    const lastmodTag = lastmod
+      ? `<lastmod>${lastmod.toISOString().slice(0, 10)}</lastmod>`
+      : "";
     return `  <url><loc>${loc}</loc>${lastmodTag}</url>`;
   })
   .join("\n")}
