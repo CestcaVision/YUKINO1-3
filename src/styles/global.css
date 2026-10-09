@@ -186,6 +186,92 @@ main {
   width: 100%;
 }
 
+.mobius-surface {
+  width: 100%;
+  max-width: 33rem;
+}
+
+.mobius-surface svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.mobius-surface svg:active {
+  cursor: grabbing;
+}
+
+.surface-mesh,
+.surface-edge {
+  fill: none;
+  stroke: var(--color-ink);
+  stroke-width: 0.8;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.surface-edge {
+  stroke: var(--color-accent);
+  stroke-width: 1.5;
+}
+
+.surface-caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  column-gap: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-line);
+}
+
+.surface-name,
+.surface-detail {
+  display: block;
+}
+
+.surface-name {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+}
+
+.surface-detail,
+.surface-hint,
+.surface-motion {
+  font-family: var(--font-ui);
+  color: var(--color-muted);
+  font-size: 0.7rem;
+  line-height: 1.6;
+}
+
+.surface-motion {
+  visibility: hidden;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.surface-hint {
+  visibility: hidden;
+  margin: 0.6rem 0 0;
+}
+
+.mobius-surface[data-ready] .surface-motion,
+.mobius-surface[data-ready] .surface-hint {
+  visibility: visible;
+}
+
+.surface-motion:disabled {
+  cursor: default;
+  text-decoration: none;
+}
+
 .plot-axis,
 .plot-tick {
   fill: none;

@@ -1,6 +1,6 @@
-# Admissions Portfolio
+# Personal Learning and Work
 
-An applicant-owned body of evidence showing academic interests, completed work, and the thinking behind that work to university admissions readers.
+A personal space for sharing learning, Notes, and Works over time. The homepage introduces this ongoing collection rather than presenting an admissions pitch. Existing evidence and authorship rules still apply to published content.
 
 ## Language
 

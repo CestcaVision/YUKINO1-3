@@ -24,7 +24,7 @@ const {
 } = Astro.props;
 const pageTitle =
   title === "Home"
-    ? `${siteName} — Technical Preview`
+    ? `${siteName} — Learning & making`
     : `${title} — ${siteName}`;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const robotsContent =
@@ -75,8 +75,8 @@ const robotsContent =
         <slot />
       </main>
       <footer class="site-footer">
-        <span>Technical preview</span>
-        <span>Content pending review</span>
+        <span>Notes, experiments, and things along the way.</span>
+        <a href="/rss.xml">Follow via RSS</a>
       </footer>
     </div>
   </body>

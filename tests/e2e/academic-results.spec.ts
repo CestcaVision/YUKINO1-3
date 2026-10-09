@@ -95,9 +95,14 @@ test("readers see verified public results with explicit achieved and predicted l
 
   for (const route of ["/", "/about/"]) {
     await page.goto(route);
-    const section = page.getByRole("region", {
-      name: route === "/" ? "Academic Snapshot" : "Academic Results",
-    });
+    if (route === "/") {
+      await expect(
+        page.getByRole("region", { name: "Academic Snapshot" }),
+      ).toHaveCount(0);
+      await expect(page.getByText("Fixture Overall Diploma")).toHaveCount(0);
+      continue;
+    }
+    const section = page.getByRole("region", { name: "Academic Results" });
     await expect(section.getByRole("listitem")).toHaveCount(2);
     await expect(
       section.getByText("Achieved: A*", { exact: true }),
@@ -209,7 +214,7 @@ test("Academic Result rejects blank fields, unofficial status, invalid dates and
   }
 });
 
-test("the compact Snapshot links to all results on desktop and mobile without JavaScript", async ({
+test("Home keeps results on About on desktop and mobile without JavaScript", async ({
   page,
 }) => {
   const build = buildResults([
@@ -245,14 +250,11 @@ test("the compact Snapshot links to all results on desktop and mobile without Ja
   ]) {
     await page.setViewportSize(viewport);
     await page.goto("/");
-    await expect(page).toHaveTitle("Admissions Portfolio — Technical Preview");
+    await expect(page).toHaveTitle("Yukino — Learning & making");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     const snapshot = page.getByRole("region", { name: "Academic Snapshot" });
-    await expect(snapshot.getByRole("listitem")).toHaveCount(3);
-    await expect(snapshot).not.toContainText("Oldest qualification");
-    await expect(snapshot.getByRole("listitem").first()).toContainText(
-      "Newest qualification",
-    );
+    await expect(snapshot).toHaveCount(0);
+    await expect(page.getByText("Newest qualification")).toHaveCount(0);
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -262,10 +264,16 @@ test("the compact Snapshot links to all results on desktop and mobile without Ja
       path: join(tmpdir(), `issue-4-home-${viewport.width}.png`),
       fullPage: true,
     });
-    await snapshot
-      .getByRole("link", { name: "View all Academic Results" })
+    if (viewport.width === 375)
+      await page.getByRole("button", { name: "Open navigation menu" }).click();
+    await page
+      .getByRole("navigation", {
+        name: viewport.width === 375 ? "Mobile" : "Primary",
+        exact: true,
+      })
+      .getByRole("link", { name: "About", exact: true })
       .click();
-    await expect(page).toHaveURL(/\/about\/#academic-results$/);
+    await expect(page).toHaveURL(/\/about\/$/);
     await expect(page).toHaveTitle(/About/);
     const results = page.getByRole("region", { name: "Academic Results" });
     await expect(results.getByRole("listitem")).toHaveCount(4);

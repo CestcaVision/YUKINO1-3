@@ -1,7 +1,6 @@
 ---
-import PlotMotif from "../components/PlotMotif.astro";
+import MobiusSurface from "../components/MobiusSurface";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import AcademicResults from "../components/AcademicResults.astro";
 import { getCollection } from "astro:content";
 
 const works = await getCollection(
@@ -51,40 +50,40 @@ const activity = [
 
 <BaseLayout
   title="Home"
-  description="Mathematical modelling and computational experiments, explored through completed Work and applicant-authored Notes."
+  description="A personal collection of things I’m learning and making: notes, small experiments, and projects in mathematics and computing."
 >
   <section class="hero" aria-labelledby="hero-title">
     <div class="hero-copy">
-      <h1 id="hero-title">
-        Exploring ideas through mathematics and computation.
-      </h1>
+      <h1 id="hero-title">A place for things I’m learning and making.</h1>
       <p>
-        Mathematical modelling and computational experiments: making ideas
-        precise, testing how they behave, and explaining what the evidence
-        shows.
+        This is where I keep notes from what I’m learning, share things I’ve
+        made, and follow questions that catch my attention. Most of them start
+        with maths or code; sometimes the interesting part is where they lead.
       </p>
     </div>
     <div class="hero-plot">
-      <PlotMotif />
+      <MobiusSurface client:visible />
     </div>
   </section>
 
   {[
     {
       id: "featured-work",
-      title: "Featured Work",
+      title: "Something I’ve made",
       item: featuredWork,
       href: "/works/",
-      link: "Explore Works",
+      link: "See all my work",
+      empty: "I’ll share my first project here when it’s ready.",
     },
     {
       id: "latest-note",
-      title: "Latest Note",
+      title: "From my notebook",
       item: latestNote,
       href: "/notes/",
-      link: "Explore Notes",
+      link: "Read all notes",
+      empty: "I’m still putting my first notes together. More soon.",
     },
-  ].map(({ id, title, item, href, link }) => (
+  ].map(({ id, title, item, href, link, empty }) => (
     <section class="evidence-section" aria-labelledby={id}>
       <h2 id={id}>{title}</h2>
       <div class="home-evidence">
@@ -97,7 +96,7 @@ const activity = [
             <p>{item.summary}</p>
           </article>
         ) : (
-          <p>No published {title === "Featured Work" ? "Work" : "Note"} yet.</p>
+          <p>{empty}</p>
         )}
         <a href={href}>{link}</a>
       </div>
@@ -105,7 +104,7 @@ const activity = [
   ))}
 
   <section class="activity-section" aria-labelledby="activity-title">
-    <h2 id="activity-title">Recent activity</h2>
+    <h2 id="activity-title">Lately</h2>
     {activity.length > 0 ? (
       <ol class="activity-list">
         {activity.map((item) => (
@@ -117,7 +116,7 @@ const activity = [
                   timeZone: "UTC",
                 })}
               </time>
-              <span>{item.kind}</span>
+              <span>{item.kind === "Milestone" ? "Update" : item.kind}</span>
             </div>
             <h3>
               {item.href ? <a href={item.href}>{item.title}</a> : item.title}
@@ -127,10 +126,11 @@ const activity = [
         ))}
       </ol>
     ) : (
-      <p>No published activity yet.</p>
+      <p>
+        New projects, notes, and little discoveries will find their way here.
+      </p>
     )}
   </section>
-  <AcademicResults snapshot />
 </BaseLayout>
 
 <style>

@@ -11,53 +11,53 @@ interface PublishedRoute {
 const publishedRoutes: PublishedRoute[] = [
   {
     path: "/",
-    pageTitle: "Admissions Portfolio — Technical Preview",
+    pageTitle: "Yukino — Learning & making",
     description:
-      "Mathematical modelling and computational experiments, explored through completed Work and applicant-authored Notes.",
+      "A personal collection of things I’m learning and making: notes, small experiments, and projects in mathematics and computing.",
     type: "website",
   },
   {
     path: "/works/",
-    pageTitle: "Works — Admissions Portfolio",
+    pageTitle: "Works — Yukino",
     description: "Completed Work and its evidence-backed Case Studies.",
     type: "website",
   },
   {
     path: "/notes/",
-    pageTitle: "Notes — Admissions Portfolio",
+    pageTitle: "Notes — Yukino",
     description: "Applicant-authored explanations of academic ideas.",
     type: "website",
   },
   {
     path: "/about/",
-    pageTitle: "About — Admissions Portfolio",
+    pageTitle: "About — Yukino",
     description: "Identity details are pending for this technical preview.",
     type: "website",
   },
   {
     path: "/works/fixture-correlation-regression/",
-    pageTitle: "Correlation and regression experiment — Admissions Portfolio",
+    pageTitle: "Correlation and regression experiment — Yukino",
     description:
       "An interactive experiment showing how sample size, outliers, and confounding variables reshape the apparent relationship between two quantities.",
     type: "article",
   },
   {
     path: "/works/fixture-sorting-algorithm-visualiser/",
-    pageTitle: "Sorting algorithm visualiser — Admissions Portfolio",
+    pageTitle: "Sorting algorithm visualiser — Yukino",
     description:
       "An interactive comparison of how common sorting algorithms move data.",
     type: "article",
   },
   {
     path: "/works/fixture-model-check/",
-    pageTitle: "Fixture model check — Admissions Portfolio",
+    pageTitle: "Fixture model check — Yukino",
     description: "A separate Work used to test evidence navigation.",
     type: "article",
     updated: "2026-08-15",
   },
   {
     path: "/notes/completing-the-square/",
-    pageTitle: "Completing the square, visually — Admissions Portfolio",
+    pageTitle: "Completing the square, visually — Yukino",
     description:
       "A geometric route from a quadratic expression to vertex form.",
     type: "article",
@@ -65,7 +65,7 @@ const publishedRoutes: PublishedRoute[] = [
   },
   {
     path: "/notes/tracing-a-loop/",
-    pageTitle: "Tracing a loop — Admissions Portfolio",
+    pageTitle: "Tracing a loop — Yukino",
     description: "Test fixture for a computational explanation.",
     type: "article",
   },
@@ -204,7 +204,7 @@ test("the 404 page stays noindex and never masquerades as a successful page", as
     "content",
     "noindex, nofollow",
   );
-  await expect(page).toHaveTitle("Page not found — Admissions Portfolio");
+  await expect(page).toHaveTitle("Page not found — Yukino");
   await expect(
     page.getByRole("heading", { level: 1, name: "Page not found" }),
   ).toBeVisible();
