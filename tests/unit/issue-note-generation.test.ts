@@ -274,3 +274,26 @@ describe("note creation and updates", () => {
     expect(await readFile(first.path, "utf8")).toBe(original);
   });
 });
+
+it("removes a duplicated article title and keeps code fences untouched", () => {
+  const note = validateGeneratedNote(
+    JSON.stringify({
+      ...generated,
+      markdown: `# Article title\n\n${generated.markdown}\n\n# Another section\n\n\`\`\`python\n# a code comment\n\`\`\``,
+    }),
+  );
+  expect(note.markdown).not.toContain("# Article title");
+  expect(note.markdown).toContain("## Another section");
+  expect(note.markdown).toContain("# a code comment");
+});
+
+it("normalizes multi-line display math without rewriting code samples", () => {
+  const note = validateGeneratedNote(
+    JSON.stringify({
+      ...generated,
+      markdown: generated.markdown + "\n\n$$a=b\nc=d$$\n\n`$$literal$$`",
+    }),
+  );
+  expect(note.markdown).toContain("$$\na=b\nc=d\n$$");
+  expect(note.markdown).toContain("`$$literal$$`");
+});
