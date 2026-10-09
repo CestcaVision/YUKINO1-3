@@ -757,6 +757,11 @@ main {
   padding: 0.25rem 0;
 }
 
+.note-body .katex-error {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .note-body table {
   display: block;
   max-width: 100%;

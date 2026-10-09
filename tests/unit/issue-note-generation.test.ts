@@ -286,3 +286,14 @@ it("removes a duplicated article title and keeps code fences untouched", () => {
   expect(note.markdown).toContain("## Another section");
   expect(note.markdown).toContain("# a code comment");
 });
+
+it("normalizes multi-line display math without rewriting code samples", () => {
+  const note = validateGeneratedNote(
+    JSON.stringify({
+      ...generated,
+      markdown: generated.markdown + "\n\n$$a=b\nc=d$$\n\n`$$literal$$`",
+    }),
+  );
+  expect(note.markdown).toContain("$$\na=b\nc=d\n$$");
+  expect(note.markdown).toContain("`$$literal$$`");
+});
