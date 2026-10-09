@@ -1,10 +1,28 @@
-import { cp, mkdir, mkdtemp, rm } from "node:fs/promises";
+import { access, cp, mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 import { check, LinkState } from "linkinator";
 
 // Mirror the Pages mount point so project-site links are checked locally too.
 const site = new URL(process.env.SITE_URL || "https://yukino1-3.github.io/");
+// Feed and sitemap URLs are absolute; check their mount point and target files
+// rather than skipping them as external links during the HTML crawl.
+const prefix = `${site.pathname.replace(/\/+$/, "")}/`;
+for (const file of ["rss.xml", "sitemap.xml"]) {
+  const xml = await readFile(join("dist", file), "utf8");
+  for (const match of xml.matchAll(
+    /<(?:link|loc)>(https?:[^<]+)<\/(?:link|loc)>/g,
+  )) {
+    const url = new URL(match[1]);
+    if (url.origin !== site.origin || !url.pathname.startsWith(prefix)) {
+      throw new Error(
+        `${file} has a URL outside the Pages mount point: ${url.href}`,
+      );
+    }
+    const path = decodeURIComponent(url.pathname.slice(prefix.length));
+    await access(join("dist", path, "index.html"));
+  }
+}
 const root = await mkdtemp(join(tmpdir(), "yukino-links-"));
 try {
   const destination = join(root, decodeURIComponent(site.pathname));

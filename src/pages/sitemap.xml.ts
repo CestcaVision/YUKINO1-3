@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import { getCollection } from "astro:content";
+import { sitePath } from "../site-path";
 
 interface SitemapUrl {
   path: string;
@@ -7,10 +8,7 @@ interface SitemapUrl {
 }
 
 export const GET: APIRoute = async ({ site }) => {
-  const base = new URL(
-    import.meta.env.BASE_URL,
-    site ?? "https://example.invalid/",
-  );
+  const base = new URL(sitePath("/"), site ?? "https://example.invalid/");
   const [works, notes] = await Promise.all([
     getCollection("works", ({ data }) => data.lifecycle === "published"),
     getCollection("notes", ({ data }) => data.lifecycle === "published"),
