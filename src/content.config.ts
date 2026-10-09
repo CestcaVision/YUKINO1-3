@@ -54,7 +54,27 @@ const notes = defineCollection({
       subject: z.enum(noteSubjects),
       media: z.array(z.enum(noteMedia)).min(1),
       capabilities: z.array(z.enum(noteCapabilities)).min(1),
+      authorship: z.enum(["student", "ai-generated"]).default("student"),
+      sourceIssue: z
+        .string()
+        .regex(/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/issues\/[1-9]\d*$/)
+        .optional(),
+      sourceHash: z
+        .string()
+        .regex(/^[a-f0-9]{64}$/)
+        .optional(),
+      generationModel: z.string().trim().min(1).optional(),
     })
+    .refine(
+      (data) =>
+        data.authorship !== "ai-generated" ||
+        Boolean(data.sourceIssue && data.sourceHash && data.generationModel),
+      {
+        message:
+          "AI-generated notes require sourceIssue, sourceHash, and generationModel",
+        path: ["authorship"],
+      },
+    )
     .refine((data) => !data.updated || data.updated >= data.date, {
       message: "updated must not be before date",
       path: ["updated"],

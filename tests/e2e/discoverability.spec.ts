@@ -25,7 +25,8 @@ const publishedRoutes: PublishedRoute[] = [
   {
     path: "/notes/",
     pageTitle: "Notes — Yukino",
-    description: "Applicant-authored explanations of academic ideas.",
+    description:
+      "Learning notes, explanations, and questions explored along the way.",
     type: "website",
   },
   {

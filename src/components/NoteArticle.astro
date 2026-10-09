@@ -1,4 +1,5 @@
 ---
+import { sitePath } from "../site-path";
 import type { CollectionEntry } from "astro:content";
 import { render } from "astro:content";
 
@@ -16,7 +17,7 @@ const { data } = note;
 
 <article class="note-detail">
   <header class="note-header">
-    <a class="note-back" href={backHref}>
+    <a class="note-back" href={sitePath(backHref)}>
       {backLabel}
     </a>
     {preview && (
@@ -24,6 +25,15 @@ const { data } = note;
     )}
     <h1>{data.title}</h1>
     <p class="note-summary">{data.summary}</p>
+    {data.authorship === "ai-generated" && (
+      <aside class="note-generation" aria-label="Note authorship">
+        <strong>AI-generated note</strong>
+        <p>
+          Expanded from a learning Issue using {data.generationModel}.{" "}
+          <a href={data.sourceIssue}>Read the original Issue</a>.
+        </p>
+      </aside>
+    )}
     <dl class="note-facts">
       <div>
         <dt>Date</dt>
@@ -64,3 +74,17 @@ const { data } = note;
     <Content />
   </div>
 </article>
+
+<style>
+  .note-generation {
+    border-left: 2px solid var(--color-accent);
+    padding: 0.25rem 0 0.25rem 1rem;
+    margin: 1.5rem 0;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+  .note-generation p {
+    margin: 0.25rem 0 0;
+    color: var(--color-muted);
+  }
+</style>

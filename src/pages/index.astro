@@ -1,4 +1,5 @@
 ---
+import { sitePath } from "../site-path";
 import MobiusSurface from "../components/MobiusSurface";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
@@ -91,14 +92,14 @@ const activity = [
           <article>
             <p class="note-meta">{item.subject}</p>
             <h3>
-              <a href={item.href}>{item.title}</a>
+              <a href={sitePath(item.href)}>{item.title}</a>
             </h3>
             <p>{item.summary}</p>
           </article>
         ) : (
           <p>{empty}</p>
         )}
-        <a href={href}>{link}</a>
+        <a href={sitePath(href)}>{link}</a>
       </div>
     </section>
   ))}
@@ -119,7 +120,11 @@ const activity = [
               <span>{item.kind === "Milestone" ? "Update" : item.kind}</span>
             </div>
             <h3>
-              {item.href ? <a href={item.href}>{item.title}</a> : item.title}
+              {item.href ? (
+                <a href={sitePath(item.href)}>{item.title}</a>
+              ) : (
+                item.title
+              )}
             </h3>
             <p>{item.summary}</p>
           </li>

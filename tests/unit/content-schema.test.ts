@@ -87,3 +87,34 @@ describe("academic result schema", () => {
     },
   );
 });
+
+describe("generated Note provenance", () => {
+  const note = {
+    title: "Generated note",
+    summary: "A summary",
+    slug: "issue-42",
+    date: "2026-10-10",
+    lifecycle: "published",
+    subject: "Mathematics",
+    media: ["Written explanation"],
+    capabilities: ["Explains a mathematical idea"],
+    authorship: "ai-generated",
+    sourceIssue: "https://github.com/owner/site/issues/42",
+    sourceHash: "a".repeat(64),
+    generationModel: "mimo-v2.6-flash",
+  };
+  it("accepts a clearly attributed generated explanation", () => {
+    expect(parse("notes", note).success).toBe(true);
+  });
+  it("rejects missing provenance and unsafe source URLs", () => {
+    expect(parse("notes", { ...note, sourceIssue: undefined }).success).toBe(
+      false,
+    );
+    expect(
+      parse("notes", { ...note, sourceIssue: "javascript:alert(1)" }).success,
+    ).toBe(false);
+    expect(parse("notes", { ...note, sourceHash: "not-a-hash" }).success).toBe(
+      false,
+    );
+  });
+});

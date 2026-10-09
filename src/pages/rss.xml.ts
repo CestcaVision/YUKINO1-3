@@ -22,7 +22,10 @@ interface FeedItem {
 }
 
 export const GET: APIRoute = async ({ site }) => {
-  const base = site ?? new URL("https://example.invalid/");
+  const base = new URL(
+    import.meta.env.BASE_URL,
+    site ?? "https://example.invalid/",
+  );
   const [works, notes, milestones] = await Promise.all([
     getCollection("works", ({ data }) => data.lifecycle === "published"),
     getCollection("notes", ({ data }) => data.lifecycle === "published"),

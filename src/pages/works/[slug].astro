@@ -1,4 +1,5 @@
 ---
+import { sitePath } from "../../site-path";
 import type { GetStaticPaths } from "astro";
 import { getCollection, render } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
@@ -30,7 +31,7 @@ const { data } = work;
 >
   <article class="case-study">
     <header class="note-header">
-      <a class="note-back" href="/works/">
+      <a class="note-back" href={sitePath("/works/")}>
         Works
       </a>
       <p class="eyebrow">Case Study</p>

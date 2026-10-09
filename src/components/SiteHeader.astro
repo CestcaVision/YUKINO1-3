@@ -1,18 +1,19 @@
 ---
+import { sitePath } from "../site-path";
 const currentPath = Astro.url.pathname;
 const links = [
   { href: "/", label: "Home" },
   { href: "/works/", label: "Works" },
   { href: "/notes/", label: "Notes" },
   { href: "/about/", label: "About" },
-];
+].map((link) => ({ ...link, href: sitePath(link.href) }));
 
 const isCurrent = (href: string) =>
-  href === "/" ? currentPath === href : currentPath.startsWith(href);
+  href === sitePath("/") ? currentPath === href : currentPath.startsWith(href);
 ---
 
 <header class="site-header">
-  <a class="site-name" href="/" aria-label="Yukino home">
+  <a class="site-name" href={sitePath("/")} aria-label="Yukino home">
     <span>Yukino</span>
     <span>Notes &amp; projects</span>
   </a>

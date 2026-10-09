@@ -1,4 +1,5 @@
 ---
+import { sitePath } from "../site-path";
 import "@fontsource-variable/inter";
 import "@fontsource-variable/newsreader";
 import SiteHeader from "../components/SiteHeader.astro";
@@ -44,7 +45,7 @@ const robotsContent =
       rel="alternate"
       type="application/rss+xml"
       title={siteName}
-      href="/rss.xml"
+      href={sitePath("/rss.xml")}
     />
     <meta property="og:type" content={type} />
     <meta property="og:site_name" content={siteName} />
@@ -76,7 +77,7 @@ const robotsContent =
       </main>
       <footer class="site-footer">
         <span>Notes, experiments, and things along the way.</span>
-        <a href="/rss.xml">Follow via RSS</a>
+        <a href={sitePath("/rss.xml")}>Follow via RSS</a>
       </footer>
     </div>
   </body>

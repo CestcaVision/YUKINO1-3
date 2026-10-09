@@ -33,12 +33,12 @@ The academic area addressed by a Work or Note, such as mathematics, economics, p
 _Avoid_: Medium, capability
 
 **Note**:
-An applicant-authored explanation that demonstrates understanding of a mathematical, economic, or related academic topic.
-_Avoid_: AI article, content post
+An explanation of a mathematical, economic, or related topic in the learning notebook. Student-authored Notes can demonstrate independent understanding; AI-generated Notes are explicitly attributed and do not make that claim.
+_Avoid_: Content post
 
 **Generated Article**:
 An article whose argument or explanation may be freely produced or substantially rewritten by AI; it is not evidence of the applicant's independent writing or subject understanding.
-_Avoid_: Note, applicant-authored work
+_Avoid_: Applicant-authored work, independent student evidence
 
 **Source Brief**:
 The applicant's concise original material submitted for developing a Note, containing the ideas or observations the applicant intends to communicate.

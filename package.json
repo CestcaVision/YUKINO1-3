@@ -15,7 +15,7 @@
     "format:check": "prettier --check .",
     "test:unit": "vitest run",
     "test:e2e": "playwright test",
-    "test:links": "linkinator dist/index.html --recurse --silent --skip \"^https?://yukino1-3\\.github\\.io\"",
+    "test:links": "node scripts/check-links.ts",
     "test": "pnpm test:unit && pnpm test:e2e"
   },
   "dependencies": {
