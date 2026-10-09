@@ -35,7 +35,7 @@ test.beforeAll(() => {
   cpSync("tests/fixtures/notes", noteDirectory, { recursive: true });
   writeFileSync(
     join(noteDirectory, "issue-42.md"),
-    `---\n${JSON.stringify(metadata)}\n---\n\n## A worked example\n\nThe equality $x^2 + 2x + 1 = (x+1)^2$ shows completing the square.\n\n$$a+b+c+d+e+f+g+h+i+j+k+l+m+n+o+p=q$$\n`,
+    `---\n${JSON.stringify(metadata)}\n---\n\n## A worked example\n\nThe equality $x^2 + 2x + 1 = (x+1)^2$ shows completing the square.\n\n$$\na+b+c+d+e+f+g+h+i+j+k+l+m+n+o+p=q\n$$\n`,
   );
   build(noteDirectory);
 });
