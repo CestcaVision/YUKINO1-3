@@ -20,7 +20,8 @@ jobs:
       (contains(github.event.issue.labels.*.name, 'math') ||
        contains(github.event.issue.labels.*.name, 'economics') ||
        contains(github.event.issue.labels.*.name, 'physics') ||
-       contains(github.event.issue.labels.*.name, 'cs'))
+       contains(github.event.issue.labels.*.name, 'cs') ||
+       contains(github.event.issue.labels.*.name, 'english'))
     environment: MIMO
     runs-on: ubuntu-latest
     timeout-minutes: 15
