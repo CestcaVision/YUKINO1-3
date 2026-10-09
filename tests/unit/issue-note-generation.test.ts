@@ -297,3 +297,27 @@ it("normalizes multi-line display math without rewriting code samples", () => {
   expect(note.markdown).toContain("$$\na=b\nc=d\n$$");
   expect(note.markdown).toContain("`$$literal$$`");
 });
+
+it("publishes English notes with a language capability and rejects two subjects", async () => {
+  const englishIssue = {
+    ...issue,
+    labels: [{ name: "notes" }, { name: "english" }],
+  };
+  expect(publicationSubject(englishIssue)).toBe("English");
+  expect(() =>
+    publicationSubject({
+      ...englishIssue,
+      labels: [...englishIssue.labels, { name: "math" }],
+    }),
+  ).toThrow("exactly one");
+  const result = await generateIssueNote({
+    issue: englishIssue,
+    repository: "owner/site",
+    contentDirectory: await directory(),
+    config,
+    fetcher: vi.fn<typeof fetch>().mockResolvedValue(response()),
+  });
+  const note = matter(await readFile(result.path, "utf8"));
+  expect(note.data.subject).toBe("English");
+  expect(note.data.capabilities).toEqual(["Explains a language concept"]);
+});

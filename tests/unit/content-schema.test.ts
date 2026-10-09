@@ -106,6 +106,15 @@ describe("generated Note provenance", () => {
   it("accepts a clearly attributed generated explanation", () => {
     expect(parse("notes", note).success).toBe(true);
   });
+  it("accepts English notes with a language capability", () => {
+    expect(
+      parse("notes", {
+        ...note,
+        subject: "English",
+        capabilities: ["Explains a language concept"],
+      }).success,
+    ).toBe(true);
+  });
   it("rejects missing provenance and unsafe source URLs", () => {
     expect(parse("notes", { ...note, sourceIssue: undefined }).success).toBe(
       false,

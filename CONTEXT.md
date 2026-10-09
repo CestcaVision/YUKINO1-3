@@ -29,11 +29,11 @@ The form or tool through which a Work is expressed, such as a web experience, co
 _Avoid_: Subject, capability
 
 **Subject**:
-The academic area addressed by a Work or Note, such as mathematics, economics, physics, or computer science.
+The academic area addressed by a Work or Note, such as mathematics, economics, physics, computer science, or English.
 _Avoid_: Medium, capability
 
 **Note**:
-An explanation of a mathematical, economic, or related topic in the learning notebook. Student-authored Notes can demonstrate independent understanding; AI-generated Notes are explicitly attributed and do not make that claim.
+An explanation of a mathematical, economic, language-learning, or related topic in the learning notebook. Student-authored Notes can demonstrate independent understanding; AI-generated Notes are explicitly attributed and do not make that claim.
 _Avoid_: Content post
 
 **Generated Article**:

@@ -12,6 +12,7 @@ export const subjectLabels = {
   economics: "Economics",
   physics: "Physics",
   cs: "Computer Science",
+  english: "English",
 } as const;
 const trustedAuthors = new Set(["OWNER", "MEMBER", "COLLABORATOR"]);
 const issueSchema = z.object({
@@ -41,7 +42,7 @@ export function publicationSubject(issue: Issue) {
   );
   if (subjects.length !== 1)
     throw new Error(
-      "Add exactly one subject label: math, economics, physics, or cs.",
+      "Add exactly one subject label: math, economics, physics, cs, or english.",
     );
   if (!issue.body?.trim())
     throw new Error("The learning Issue needs a non-empty body.");
@@ -281,7 +282,11 @@ export async function generateIssueNote(options: {
     lifecycle: "published",
     subject,
     media: ["Written explanation"],
-    capabilities: ["Explains a mathematical idea"],
+    capabilities: [
+      subject === "English"
+        ? "Explains a language concept"
+        : "Explains a mathematical idea",
+    ],
     authorship: "ai-generated",
     sourceIssue,
     sourceHash: hash,

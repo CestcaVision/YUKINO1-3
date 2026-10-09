@@ -37,6 +37,10 @@ test.beforeAll(() => {
     join(noteDirectory, "issue-42.md"),
     `---\n${JSON.stringify(metadata)}\n---\n\n## A worked example\n\nThe equality $x^2 + 2x + 1 = (x+1)^2$ shows completing the square.\n\n$$\na+b+c+d+e+f+g+h+i+j+k+l+m+n+o+p=q\n$$\n`,
   );
+  writeFileSync(
+    join(noteDirectory, "issue-43.md"),
+    `---\n${JSON.stringify({ ...metadata, title: "English word formation", slug: "issue-43", subject: "English", capabilities: ["Explains a language concept"] })}\n---\n\n## Nouns and verbs\n\nSome nouns form verbs with the suffix -ize.\n`,
+  );
   build(noteDirectory);
 });
 test.afterAll(() => {
@@ -106,4 +110,16 @@ test("long generated formulas scroll within the note on mobile", async ({
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   ).toBe(true);
+});
+
+test("English notes can be filtered and opened", async ({ page }) => {
+  await page.goto("/notes/");
+  await page.getByRole("radio", { name: "English", exact: true }).check();
+  await expect(page.getByRole("link", { name: metadata.title })).toBeHidden();
+  await page.getByRole("link", { name: "English word formation" }).click();
+  await expect(page).toHaveURL(/\/notes\/issue-43\/$/);
+  await expect(page.locator(".note-facts")).toContainText("English");
+  await expect(page.locator(".note-facts")).toContainText(
+    "Explains a language concept",
+  );
 });

@@ -28,7 +28,7 @@ will not publish the student's website.
    intended. The build reads the configured Pages URL automatically, including
    a fork’s project path or custom domain. For a local deployment build, set
    `SITE_URL` to that full URL.
-5. Create the labels `notes`, `math`, `cs`, `physics`, and `economics` before using
+5. Create the labels `notes`, `math`, `cs`, `physics`, `economics`, and `english` before using
    the Issue forms. Issue forms do not create missing labels.
 
 For example, a maintainer can create the labels with:
@@ -39,6 +39,7 @@ gh label create math --repo YUKINO1-3/YUKINO1-3.github.io --color 1e4ed8 --descr
 gh label create cs --repo YUKINO1-3/YUKINO1-3.github.io --color 1e4ed8 --description 'Computer Science' --force
 gh label create physics --repo YUKINO1-3/YUKINO1-3.github.io --color 1e4ed8 --description 'Physics' --force
 gh label create economics --repo YUKINO1-3/YUKINO1-3.github.io --color 1e4ed8 --description 'Economics' --force
+gh label create english --repo YUKINO1-3/YUKINO1-3.github.io --color 1e4ed8 --description 'English' --force
 ```
 
 The API request format, Token Plan URL, and JSON mode follow the
@@ -47,7 +48,7 @@ and [MiMo structured-output documentation](https://mimo.mi.com/docs/zh-CN/quick-
 
 ## Publish a note
 
-Use the mathematics, computer science, physics, or economics Issue form. Its
+Use the mathematics, computer science, physics, economics, or English Issue form. Its
 labels are applied automatically when they exist. Write a specific title and
 explain the question, known concepts, examples, confusion, and any source links.
 The note uses the language of the Issue.
@@ -60,6 +61,7 @@ Alternatively, create a normal Issue and apply the actual GitHub labels:
 | `notes` + `cs` | Computer Science |
 | `notes` + `physics` | Physics |
 | `notes` + `economics` | Economics |
+| `notes` + `english` | English |
 
 Writing `#notes #math` in the title or body is not enough. Exactly one subject
 label is required. Only Issues authored by repository owners, members, or

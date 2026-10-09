@@ -9,6 +9,7 @@ export const noteSubjects = [
   "Economics",
   "Physics",
   "Computer Science",
+  "English",
 ] as const;
 export const noteMedia = [
   "Written explanation",
@@ -17,6 +18,7 @@ export const noteMedia = [
 ] as const;
 export const noteCapabilities = [
   "Explains a mathematical idea",
+  "Explains a language concept",
   "Builds a computational model",
   "Interprets evidence",
 ] as const;
