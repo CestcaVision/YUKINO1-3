@@ -274,3 +274,15 @@ describe("note creation and updates", () => {
     expect(await readFile(first.path, "utf8")).toBe(original);
   });
 });
+
+it("removes a duplicated article title and keeps code fences untouched", () => {
+  const note = validateGeneratedNote(
+    JSON.stringify({
+      ...generated,
+      markdown: `# Article title\n\n${generated.markdown}\n\n# Another section\n\n\`\`\`python\n# a code comment\n\`\`\``,
+    }),
+  );
+  expect(note.markdown).not.toContain("# Article title");
+  expect(note.markdown).toContain("## Another section");
+  expect(note.markdown).toContain("# a code comment");
+});
