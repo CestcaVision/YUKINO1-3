@@ -35,7 +35,7 @@ test.beforeAll(() => {
   cpSync("tests/fixtures/notes", noteDirectory, { recursive: true });
   writeFileSync(
     join(noteDirectory, "issue-42.md"),
-    `---\n${JSON.stringify(metadata)}\n---\n\n## A worked example\n\nThe equality $x^2 + 2x + 1 = (x+1)^2$ shows completing the square.\n`,
+    `---\n${JSON.stringify(metadata)}\n---\n\n## A worked example\n\nThe equality $x^2 + 2x + 1 = (x+1)^2$ shows completing the square.\n\n$$a+b+c+d+e+f+g+h+i+j+k+l+m+n+o+p=q$$\n`,
   );
   build(noteDirectory);
 });
@@ -66,7 +66,7 @@ test("generated notes are discoverable and clearly attributed to their Issue and
   await expect(
     attribution.getByRole("link", { name: "Read the original Issue" }),
   ).toHaveAttribute("href", metadata.sourceIssue);
-  await expect(page.locator(".katex")).toBeVisible();
+  await expect(page.locator(".katex").first()).toBeVisible();
   await page.goto("/");
   await expect(
     page
@@ -87,4 +87,23 @@ test("generated explanations do not become evidence of the student's independent
       .getByRole("region", { name: "Capabilities" })
       .getByRole("link", { name: metadata.title }),
   ).toHaveCount(0);
+});
+
+test("long generated formulas scroll within the note on mobile", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/notes/issue-42/");
+  const formula = page.locator(".katex-display");
+  await expect(formula).toBeVisible();
+  expect(
+    await formula.evaluate(
+      (element) => element.scrollWidth > element.clientWidth,
+    ),
+  ).toBe(true);
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
 });

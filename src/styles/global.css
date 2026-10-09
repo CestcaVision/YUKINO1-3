@@ -751,6 +751,18 @@ main {
   margin: 0 0 1.5rem;
 }
 
+.note-body .katex-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.25rem 0;
+}
+
+.note-body table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 .note-body pre {
   background: var(--color-surface);
   border-left: 3px solid var(--color-accent);
