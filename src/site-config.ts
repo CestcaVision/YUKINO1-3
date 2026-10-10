@@ -1,4 +1,4 @@
-export const siteName = "Admissions Portfolio";
+export const siteName = "Yukino";
 
 // Search engines are told not to index the Portfolio while it is a technical preview.
 // This is a human decision, not an automated one: flip it only once the applicant has

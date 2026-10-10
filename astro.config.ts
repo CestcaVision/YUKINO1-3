@@ -80,6 +80,10 @@ function validateContentFiles(): AstroIntegration {
   };
 }
 
+const deploymentURL = new URL(
+  process.env.SITE_URL || "https://yukino1-3.github.io/",
+);
+
 export default defineConfig({
   integrations: [validateContentFiles(), react()],
   markdown: {
@@ -89,5 +93,6 @@ export default defineConfig({
     }),
   },
   output: "static",
-  site: "https://yukino1-3.github.io",
+  site: deploymentURL.origin,
+  base: deploymentURL.pathname,
 });

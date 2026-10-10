@@ -1,0 +1,26 @@
+name: 发布物理学习笔记
+description: 写下学习主题和素材，由 MiMo 扩展为笔记并自动发布。
+title: "[Note] "
+labels: [notes, physics]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        这份 Issue 会触发自动生成和发布，页面会注明 AI 生成及来源 Issue。
+        可以使用中文或英文。标题请写具体主题，正文请写清楚要解释的问题。
+  - type: textarea
+    id: source-brief
+    attributes:
+      label: 学习主题与原始素材
+      description: 写下想理解的问题、已知的概念、推导思路、例子或困惑。
+      placeholder: |
+        我在学习……，想解释……
+        请重点讨论……
+        可以用这个例子展开……
+    validations:
+      required: true
+  - type: textarea
+    id: references
+    attributes:
+      label: 参考资料（可选）
+      description: 提供需要保留的原始链接或摘录；模型不会自动查阅链接。

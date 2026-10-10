@@ -1,4 +1,5 @@
 ---
+import { sitePath } from "../../site-path";
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import EvidenceFilters from "../../components/EvidenceFilters.astro";
@@ -8,7 +9,8 @@ const works = (
 ).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const notes = await getCollection(
   "notes",
-  ({ data }) => data.lifecycle === "published",
+  ({ data }) =>
+    data.lifecycle === "published" && data.authorship !== "ai-generated",
 );
 const evidence = [
   ...works.map((work) => ({
@@ -66,7 +68,9 @@ const categories = [...new Set(works.map((work) => work.data.category))];
                       <span>{data.subject}</span>
                     </div>
                     <h3>
-                      <a href={`/works/${data.slug}/`}>{data.title}</a>
+                      <a href={sitePath(`/works/${data.slug}/`)}>
+                        {data.title}
+                      </a>
                     </h3>
                     <p>{data.summary}</p>
                   </article>
@@ -89,7 +93,7 @@ const categories = [...new Set(works.map((work) => work.data.category))];
                   .filter((item) => item.capabilities.includes(capability))
                   .map((item) => (
                     <li>
-                      <a href={item.href}>{item.title}</a>
+                      <a href={sitePath(item.href)}>{item.title}</a>
                     </li>
                   ))}
               </ul>

@@ -19,10 +19,10 @@ Do not add sample scores to the production collection. An empty collection is va
 All fields except `subject` are required, including for non-public records.
 Only records with both `evidenceChecked: true` and `public: true` are rendered.
 About lists all eligible records, newest effective date first. The homepage
-Academic Snapshot shows at most three and links to About. Predictions are labelled
-“Officially predicted”; completed results are labelled “Achieved”. With no eligible
-records, the homepage omits the Snapshot and About states that no verified results
-are published yet.
+focuses on personal learning, Notes, and Works and does not display Academic
+Results. Predictions on About are labelled “Officially predicted”; completed
+results are labelled “Achieved”. With no eligible records, About states that no
+verified results are published yet.
 
 Keep supporting evidence outside this public repository. The flags record a human
 review, not an automated verification. Files committed to a public repository are

@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches: [main]
@@ -18,6 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      pages: read
     steps:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -56,14 +58,23 @@ jobs:
       - name: Browser smoke tests
         run: pnpm run test:e2e
 
+      - name: Read GitHub Pages deployment URL
+        id: pages
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+
       - name: Production build
         run: pnpm run build
+        env:
+          SITE_URL: ${{ steps.pages.outputs.base_url || 'https://yukino1-3.github.io/' }}
 
       - name: Check links in the production build
         run: pnpm run test:links
+        env:
+          SITE_URL: ${{ steps.pages.outputs.base_url || 'https://yukino1-3.github.io/' }}
 
       - name: Upload production build
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: production-build
@@ -73,7 +84,7 @@ jobs:
   deploy:
     name: Deploy to GitHub Pages
     needs: validate
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     concurrency:
       group: pages

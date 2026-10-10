@@ -103,13 +103,30 @@ test("evidence filter controls are keyboard-operable on Notes page", async ({
   page,
 }) => {
   await page.goto("/notes/");
-  const subjectSelect = page.getByLabel("Subject", { exact: true });
-  await subjectSelect.focus();
-  await expect(subjectSelect).toBeFocused();
+  const allSubjects = page
+    .getByRole("group", { name: "Subject", exact: true })
+    .getByRole("radio", { name: "All", exact: true });
+  await allSubjects.focus();
+  await expect(allSubjects).toBeFocused();
+  await page.keyboard.press("ArrowRight");
+  await expect(
+    page
+      .getByRole("group", { name: "Subject", exact: true })
+      .getByRole("radio", { name: "Computer Science", exact: true }),
+  ).toBeChecked();
+  await expect(page.getByRole("status")).toHaveText("1 result");
   await page.keyboard.press("Tab");
-  await expect(page.getByLabel("Medium", { exact: true })).toBeFocused();
+  await expect(
+    page
+      .getByRole("group", { name: "Medium", exact: true })
+      .getByRole("radio", { name: "All", exact: true }),
+  ).toBeFocused();
   await page.keyboard.press("Tab");
-  await expect(page.getByLabel("Capability", { exact: true })).toBeFocused();
+  await expect(
+    page
+      .getByRole("group", { name: "Capability", exact: true })
+      .getByRole("radio", { name: "All", exact: true }),
+  ).toBeFocused();
   await page.keyboard.press("Tab");
   await expect(
     page.getByRole("button", { name: "Clear filters" }),

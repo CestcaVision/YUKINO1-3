@@ -1,6 +1,6 @@
-# Admissions Portfolio
+# Personal Learning and Work
 
-An applicant-owned body of evidence showing academic interests, completed work, and the thinking behind that work to university admissions readers.
+A personal space for sharing learning, Notes, and Works over time. The homepage introduces this ongoing collection rather than presenting an admissions pitch. Existing evidence and authorship rules still apply to published content.
 
 ## Language
 
@@ -29,16 +29,16 @@ The form or tool through which a Work is expressed, such as a web experience, co
 _Avoid_: Subject, capability
 
 **Subject**:
-The academic area addressed by a Work or Note, such as mathematics, economics, physics, or computer science.
+The academic area addressed by a Work or Note, such as mathematics, economics, physics, computer science, or English.
 _Avoid_: Medium, capability
 
 **Note**:
-An applicant-authored explanation that demonstrates understanding of a mathematical, economic, or related academic topic.
-_Avoid_: AI article, content post
+An explanation of a mathematical, economic, language-learning, or related topic in the learning notebook. Student-authored Notes can demonstrate independent understanding; AI-generated Notes are explicitly attributed and do not make that claim.
+_Avoid_: Content post
 
 **Generated Article**:
 An article whose argument or explanation may be freely produced or substantially rewritten by AI; it is not evidence of the applicant's independent writing or subject understanding.
-_Avoid_: Note, applicant-authored work
+_Avoid_: Applicant-authored work, independent student evidence
 
 **Source Brief**:
 The applicant's concise original material submitted for developing a Note, containing the ideas or observations the applicant intends to communicate.

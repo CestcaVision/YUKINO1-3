@@ -4,7 +4,7 @@ const routes = [
   {
     name: "home",
     path: "/",
-    heading: "Exploring ideas through mathematics and computation.",
+    heading: "A place for things I’m learning and making.",
   },
   { name: "works", path: "/works/", heading: "Works" },
   { name: "notes", path: "/notes/", heading: "Notes" },
@@ -76,7 +76,7 @@ test.describe("without client-side JavaScript", () => {
     await expect(
       page.getByRole("heading", {
         level: 1,
-        name: "Exploring ideas through mathematics and computation.",
+        name: "A place for things I’m learning and making.",
       }),
     ).toBeVisible();
 

@@ -26,15 +26,22 @@ const fields = [
   {items.length > 0 && (
     <form hidden aria-label="Filter published evidence">
       {fields.map(({ name, label, values }) => (
-        <label>
-          {label}
-          <select name={name} aria-label={label}>
-            <option value="">All</option>
-            {[...new Set(values)].sort().map((value) => (
-              <option value={value}>{value}</option>
+        <fieldset>
+          <legend>{label}</legend>
+          <div class="filter-options">
+            {["", ...[...new Set(values)].sort()].map((value) => (
+              <label class="filter-option">
+                <input
+                  type="radio"
+                  name={name}
+                  value={value}
+                  checked={value === ""}
+                />
+                <span>{value || "All"}</span>
+              </label>
             ))}
-          </select>
-        </label>
+          </div>
+        </fieldset>
       ))}
       <button type="reset">Clear filters</button>
     </form>
@@ -52,7 +59,7 @@ const fields = [
     connectedCallback() {
       const form = this.querySelector("form");
       if (!form) return;
-      const selects = Array.from(form.querySelectorAll("select"));
+      const inputs = Array.from(form.querySelectorAll("input"));
       const items = Array.from(
         this.querySelectorAll<HTMLElement>("[data-evidence-item]"),
       );
@@ -62,11 +69,12 @@ const fields = [
       const status = this.querySelector<HTMLElement>('[role="status"]')!;
       const empty = this.querySelector<HTMLElement>("[data-no-matches]")!;
       const update = () => {
+        const selected = inputs.filter((input) => input.checked);
         for (const item of items) {
           const values: Record<string, string | string[]> = JSON.parse(
             item.dataset.evidenceItem!,
           );
-          item.hidden = !selects.every(
+          item.hidden = !selected.every(
             ({ name, value }) =>
               !value ||
               (Array.isArray(values[name])
@@ -86,8 +94,8 @@ const fields = [
       form.addEventListener("submit", (event) => event.preventDefault());
       form.addEventListener("change", update);
       form.addEventListener("reset", () => {
-        selects.forEach((select) => {
-          select.value = "";
+        inputs.forEach((input) => {
+          input.checked = input.defaultChecked;
         });
         update();
       });
@@ -104,33 +112,89 @@ const fields = [
     display: block;
   }
   form {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: end;
-    gap: 1rem;
-    padding: 2rem 0 0.5rem;
+    display: grid;
+    gap: 1.25rem;
+    padding: 2rem 0 1rem;
   }
   form[hidden] {
     display: none;
   }
-  label {
-    display: grid;
-    gap: 0.5rem;
-    font-size: 0.9rem;
-    max-width: 100%;
+  fieldset {
+    border: 0;
+    margin: 0;
+    padding: 0;
+    min-width: 0;
   }
-  select,
+  legend {
+    padding: 0;
+    margin-bottom: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-muted);
+  }
+  .filter-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .filter-option {
+    position: relative;
+    max-width: 100%;
+    cursor: pointer;
+  }
+  .filter-option input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+  }
+  .filter-option span {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--color-line);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+    transition:
+      background-color 140ms ease,
+      border-color 140ms ease;
+  }
+  .filter-option:hover span {
+    background: var(--color-surface);
+    border-color: var(--color-muted);
+  }
+  .filter-option input:checked + span {
+    background: var(--color-ink);
+    border-color: var(--color-ink);
+    color: var(--color-paper);
+  }
+  .filter-option input:focus-visible + span {
+    outline: 0.15rem solid var(--color-accent);
+    outline-offset: 0.25rem;
+  }
   button {
     font: inherit;
-    padding: 0.75rem;
-    border: 1px solid var(--color-line);
-    background: var(--color-paper);
-    color: var(--color-ink);
-    max-width: 100%;
+    justify-self: start;
+    padding: 0.5rem 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-muted);
+    font-size: 0.8rem;
     min-height: 44px;
-  }
-  button {
     cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 0.22em;
+  }
+  button:hover {
+    color: var(--color-ink);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .filter-option span {
+      transition: none;
+    }
   }
   [role="status"] {
     color: var(--color-muted);

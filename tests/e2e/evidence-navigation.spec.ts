@@ -4,15 +4,21 @@ test("readers filter published Notes with keyboard-accessible controlled classif
   page,
 }) => {
   await page.goto("/notes/");
-  await expect(page.getByLabel("Subject", { exact: true })).toBeVisible();
-  await page.getByLabel("Subject", { exact: true }).selectOption("Mathematics");
+  await expect(
+    page.getByRole("group", { name: "Subject", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("group", { name: "Subject", exact: true })
+    .getByRole("radio", { name: "Mathematics", exact: true })
+    .check();
   await expect(
     page.getByRole("link", { name: "Completing the square, visually" }),
   ).toBeVisible();
   await expect(page.getByRole("link", { name: "Tracing a loop" })).toBeHidden();
   await page
-    .getByLabel("Medium", { exact: true })
-    .selectOption("Interactive demonstration");
+    .getByRole("group", { name: "Medium", exact: true })
+    .getByRole("radio", { name: "Interactive demonstration", exact: true })
+    .check();
   await expect(page.getByRole("status")).toHaveText("0 results");
   await expect(
     page.getByText("No published evidence matches these filters."),
@@ -20,8 +26,9 @@ test("readers filter published Notes with keyboard-accessible controlled classif
   await page.getByRole("button", { name: "Clear filters" }).click();
   await expect(page.getByRole("status")).toHaveText("2 results");
   await page
-    .getByLabel("Capability", { exact: true })
-    .selectOption("Builds a computational model");
+    .getByRole("group", { name: "Capability", exact: true })
+    .getByRole("radio", { name: "Builds a computational model", exact: true })
+    .check();
   await expect(
     page.getByRole("link", { name: "Tracing a loop" }),
   ).toBeVisible();
@@ -29,10 +36,10 @@ test("readers filter published Notes with keyboard-accessible controlled classif
     page.getByRole("link", { name: "Completing the square, visually" }),
   ).toBeHidden();
   await expect(
-    page.getByRole("option", { name: "Economics", exact: true }),
+    page.getByRole("radio", { name: "Economics", exact: true }),
   ).toHaveCount(0);
   await expect(
-    page.getByRole("option", { name: "Interprets evidence", exact: true }),
+    page.getByRole("radio", { name: "Interprets evidence", exact: true }),
   ).toHaveCount(0);
 });
 
@@ -42,15 +49,15 @@ test("Home connects featured evidence, the latest Note and chronological publish
   await page.goto("/");
   await expect(
     page
-      .getByRole("region", { name: "Featured Work" })
+      .getByRole("region", { name: "Something I’ve made" })
       .getByRole("link", { name: "Sorting algorithm visualiser" }),
   ).toHaveAttribute("href", "/works/fixture-sorting-algorithm-visualiser/");
   await expect(
     page
-      .getByRole("region", { name: "Latest Note" })
+      .getByRole("region", { name: "From my notebook" })
       .getByRole("link", { name: "Completing the square, visually" }),
   ).toHaveAttribute("href", "/notes/completing-the-square/");
-  const activity = page.getByRole("region", { name: "Recent activity" });
+  const activity = page.getByRole("region", { name: "Lately" });
   await expect(activity.getByRole("listitem")).toHaveCount(6);
   await expect(activity.getByRole("listitem").nth(0)).toContainText(
     "Fixture research presentation",
@@ -84,12 +91,13 @@ test("Works filters hide unmatched groups and every Capability links to publishe
 }) => {
   await page.goto("/works/");
   const works = page.locator("evidence-filters");
-  await page.getByLabel("Subject", { exact: true }).focus();
-  await page.keyboard.press("m");
-  await page.keyboard.press("Enter");
-  await expect(page.getByLabel("Subject", { exact: true })).toHaveValue(
-    "Mathematics",
-  );
+  const subject = page.getByRole("group", { name: "Subject", exact: true });
+  await subject.getByRole("radio", { name: "All", exact: true }).focus();
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowRight");
+  await expect(
+    subject.getByRole("radio", { name: "Mathematics", exact: true }),
+  ).toBeChecked();
   await expect(
     works.getByRole("link", { name: "Fixture model check" }),
   ).toBeVisible();
@@ -100,13 +108,15 @@ test("Works filters hide unmatched groups and every Capability links to publishe
     works.getByRole("heading", { name: "Interactive systems" }),
   ).toBeVisible();
   await page
-    .getByLabel("Medium", { exact: true })
-    .selectOption("Web experience");
+    .getByRole("group", { name: "Medium", exact: true })
+    .getByRole("radio", { name: "Web experience", exact: true })
+    .check();
   await expect(page.getByRole("status")).toHaveText("1 result");
   await page.getByRole("button", { name: "Clear filters" }).click();
   await page
-    .getByLabel("Capability", { exact: true })
-    .selectOption("Builds a computational model");
+    .getByRole("group", { name: "Capability", exact: true })
+    .getByRole("radio", { name: "Builds a computational model", exact: true })
+    .check();
   await expect(
     works.getByRole("link", { name: "Sorting algorithm visualiser" }),
   ).toBeVisible();
@@ -117,10 +127,10 @@ test("Works filters hide unmatched groups and every Capability links to publishe
     works.getByRole("link", { name: "Correlation and regression experiment" }),
   ).toBeHidden();
   await expect(
-    page.getByRole("option", { name: "3D animation", exact: true }),
+    page.getByRole("radio", { name: "3D animation", exact: true }),
   ).toHaveCount(0);
   await expect(
-    page.getByRole("option", { name: "Interprets evidence", exact: true }),
+    page.getByRole("radio", { name: "Interprets evidence", exact: true }),
   ).toHaveCount(1);
   await expect(
     page.getByRole("heading", { name: "Visual explanations" }),
@@ -187,8 +197,9 @@ for (const width of [1440, 375]) {
         ).toBeHidden();
     }
     await page
-      .getByLabel("Subject", { exact: true })
-      .selectOption("Mathematics");
+      .getByRole("group", { name: "Subject", exact: true })
+      .getByRole("radio", { name: "Mathematics", exact: true })
+      .check();
     await expect(page.getByRole("status")).toHaveText("2 results");
     expect(
       await page.evaluate(
@@ -200,9 +211,7 @@ for (const width of [1440, 375]) {
       fullPage: true,
     });
     await page.goto("/");
-    await expect(
-      page.getByRole("region", { name: "Recent activity" }),
-    ).toBeVisible();
+    await expect(page.getByRole("region", { name: "Lately" })).toBeVisible();
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -223,9 +232,7 @@ test.describe("static evidence", () => {
   }) => {
     await page.goto("/");
     await expect(
-      page
-        .getByRole("region", { name: "Recent activity" })
-        .getByRole("listitem"),
+      page.getByRole("region", { name: "Lately" }).getByRole("listitem"),
     ).toHaveCount(6);
     for (const [route, linkCount] of [
       ["/works/", 3],
