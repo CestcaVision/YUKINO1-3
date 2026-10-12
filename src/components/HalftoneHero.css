@@ -1,0 +1,201 @@
+.halftone-portrait {
+  position: relative;
+}
+
+.halftone-reveal-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+.halftone-customizer summary {
+  align-items: center;
+  cursor: pointer;
+  display: flex;
+  gap: 0.4rem;
+  list-style: none;
+  min-height: 2.75rem;
+}
+.halftone-customizer summary::-webkit-details-marker {
+  display: none;
+}
+.halftone-customizer summary:hover,
+.halftone-customizer[open] summary {
+  color: var(--color-accent);
+}
+.halftone-config-panel {
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  border-radius: 0.65rem;
+  bottom: 3.5rem;
+  box-shadow: 0 1rem 3.5rem #0d0d0d1a;
+  color: var(--color-ink);
+  inset-inline: 0;
+  max-height: min(32rem, 65svh, calc(100% - 3.75rem));
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 1.25rem;
+  position: absolute;
+  scrollbar-width: thin;
+  z-index: 2;
+}
+.halftone-config-header,
+.halftone-config-footer {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.halftone-config-header {
+  margin-bottom: 1.25rem;
+}
+.halftone-config-header h2 {
+  font-family: var(--font-display);
+  font-size: 1.65rem;
+  font-weight: 500;
+  line-height: 1.1;
+  margin: 0;
+}
+.halftone-config-header p {
+  color: var(--color-muted);
+  margin: 0.3rem 0 0;
+}
+.halftone-config-grid {
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 90rem) {
+  .halftone-config-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.halftone-config-field {
+  align-items: center;
+  background: var(--color-surface);
+  border: 1px solid transparent;
+  border-radius: 0.35rem;
+  display: flex;
+  font-size: 0.8rem;
+  gap: 0.5rem;
+  justify-content: space-between;
+  min-height: 3rem;
+  min-width: 0;
+  padding: 0.65rem;
+}
+.halftone-config-field:focus-within {
+  border-color: var(--color-accent);
+}
+.halftone-config-field > span:first-child {
+  color: var(--color-muted);
+}
+.halftone-config-field select {
+  background: transparent;
+  border: 0;
+  color: var(--color-ink);
+  font: inherit;
+  max-width: 62%;
+  min-width: 0;
+  padding: 0.35rem 0;
+}
+.halftone-config-range {
+  align-items: stretch;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.halftone-config-range > span {
+  align-items: center;
+  display: flex;
+  gap: 0.3rem;
+  justify-content: space-between;
+}
+.halftone-config-field output {
+  color: var(--color-ink);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+.halftone-config-range input {
+  accent-color: var(--color-accent);
+  cursor: pointer;
+  margin: 0;
+  min-height: 1.25rem;
+  width: 100%;
+}
+.halftone-color-value {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.halftone-config-color input {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  height: 1.75rem;
+  padding: 0;
+  width: 1.75rem;
+}
+.halftone-config-toggle input {
+  appearance: none;
+  background: #d8dbe2;
+  border: 1px solid #b9bfcb;
+  border-radius: 1rem;
+  cursor: pointer;
+  height: 1.25rem;
+  margin: 0;
+  position: relative;
+  transition: background 150ms ease;
+  width: 2.15rem;
+}
+
+.halftone-config-toggle input::before {
+  background: white;
+  border-radius: 50%;
+  content: "";
+  height: 0.85rem;
+  inset-inline-start: 0.15rem;
+  position: absolute;
+  top: 0.15rem;
+  transition: transform 150ms ease;
+  width: 0.85rem;
+}
+
+.halftone-config-toggle input:checked {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.halftone-config-toggle input:checked::before {
+  transform: translateX(0.9rem);
+}
+.halftone-config-footer {
+  border-top: 1px solid var(--color-line);
+  color: var(--color-muted);
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+}
+@media (max-width: 28rem) {
+  .halftone-config-panel {
+    bottom: 1rem;
+    inset-inline: 1rem;
+    max-height: min(70svh, calc(100svh - 2rem));
+    padding: 0.85rem;
+    position: fixed;
+    z-index: 30;
+  }
+  .halftone-config-grid {
+    gap: 0.4rem;
+  }
+  .halftone-config-field {
+    font-size: 0.75rem;
+    padding: 0.5rem;
+  }
+  .halftone-config-color {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .halftone-reveal-actions {
+    justify-content: space-between;
+    width: 100%;
+  }
+}
