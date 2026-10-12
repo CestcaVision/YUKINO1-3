@@ -2,6 +2,8 @@
 import { sitePath } from "../site-path";
 import MobiusSurface from "../components/MobiusSurface";
 import HalftoneHero from "../components/HalftoneHero";
+import BezierStudy from "../components/BezierStudy.astro";
+import LorenzTrace from "../components/LorenzTrace.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
 
@@ -115,41 +117,43 @@ const activity = [
     </div>
   </section>
 
-  {[
-    {
-      id: "latest-note",
-      title: "From my notebook",
-      item: latestNote,
-      href: "/notes/",
-      link: "Read all notes",
-      empty: "I’m still putting my first notes together. More soon.",
-    },
-  ].map(({ id, title, item, href, link, empty }) => (
-    <section class="evidence-section" aria-labelledby={id}>
-      <h2 id={id}>{title}</h2>
-      <div class="home-evidence">
-        {item ? (
-          <article>
-            <p class="note-meta">{item.subject}</p>
-            <h3>
-              <a href={sitePath(item.href)}>{item.title}</a>
-            </h3>
-            <p>{item.summary}</p>
-          </article>
-        ) : (
-          <p>{empty}</p>
-        )}
-        <a href={sitePath(href)}>{link}</a>
-      </div>
-    </section>
-  ))}
+  <section
+    class="evidence-section notebook-section"
+    aria-labelledby="latest-note"
+  >
+    <div class="section-art-column">
+      <h2 id="latest-note">From my notebook</h2>
+      <BezierStudy />
+    </div>
+    <div class="home-evidence">
+      {latestNote ? (
+        <article>
+          <p class="note-meta">{latestNote.subject}</p>
+          <h3>
+            <a href={sitePath(latestNote.href)}>{latestNote.title}</a>
+          </h3>
+          <p>{latestNote.summary}</p>
+        </article>
+      ) : (
+        <p>I’m still putting my first notes together. More soon.</p>
+      )}
+      <a href={sitePath("/notes/")}>Read all notes</a>
+    </div>
+  </section>
 
   <section class="activity-section" aria-labelledby="activity-title">
-    <h2 id="activity-title">Lately</h2>
+    <div class="section-art-column">
+      <h2 id="activity-title">Lately</h2>
+      <LorenzTrace items={activity} />
+    </div>
     {activity.length > 0 ? (
       <ol class="activity-list">
-        {activity.map((item) => (
-          <li>
+        {activity.map((item, index) => (
+          <li
+            id={`recent-activity-${index}`}
+            data-activity-entry={index}
+            tabindex="-1"
+          >
             <div class="note-meta">
               <time datetime={item.date.toISOString()}>
                 {item.date.toLocaleDateString("en-GB", {
@@ -179,6 +183,12 @@ const activity = [
 </BaseLayout>
 
 <style>
+  .section-art-column {
+    min-width: 0;
+  }
+  .notebook-section .home-evidence {
+    align-self: center;
+  }
   .home-evidence h3,
   .activity-list h3 {
     font-family: var(--font-display);

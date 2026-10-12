@@ -1,0 +1,465 @@
+---
+import {
+  INITIAL_CONTROLS,
+  INITIAL_PARAMETER,
+  ribbonGeometry,
+  cubicPath,
+  construction,
+} from "./math-art/bezier";
+import { path2 } from "./math-art/geometry";
+import "./section-sketches.css";
+const ribbons = ribbonGeometry(INITIAL_CONTROLS);
+const stages = construction(INITIAL_CONTROLS, INITIAL_PARAMETER);
+const pointNames = [
+  "Start point",
+  "First control point",
+  "Second control point",
+  "End point",
+];
+---
+
+<bezier-study
+  data-playing="false"
+  data-parameter={INITIAL_PARAMETER.toFixed(3)}
+>
+  <figure class="math-art">
+    <div class="math-art-stage">
+      <svg
+        class="math-art-scene bezier-scene"
+        viewBox="0 0 440 440"
+        role="img"
+        aria-label="A flowing blue ribbon of cubic Bézier curves shaped by four points"
+        data-bezier-scene
+      >
+        {ribbons.map(({ d, opacity }) => (
+          <path class="bezier-ribbon" d={d} opacity={opacity} />
+        ))}
+        <path class="bezier-main" d={cubicPath(INITIAL_CONTROLS)} />
+        <g class="bezier-guides">
+          <path data-handle-line="0" d={path2(INITIAL_CONTROLS.slice(0, 2))} />
+          <path data-handle-line="1" d={path2(INITIAL_CONTROLS.slice(2, 4))} />
+        </g>
+        <g data-construction data-hidden="">
+          <path class="bezier-control-polygon" d={path2(INITIAL_CONTROLS)} />
+          <path class="bezier-first-level" d={path2(stages.first)} />
+          <path class="bezier-second-level" d={path2(stages.second)} />
+          {stages.first.map(([x, y]) => (
+            <circle
+              class="bezier-intermediate"
+              data-first-point
+              cx={x}
+              cy={y}
+              r="3"
+            />
+          ))}
+          {stages.second.map(([x, y]) => (
+            <circle
+              class="bezier-intermediate"
+              data-second-point
+              cx={x}
+              cy={y}
+              r="3.5"
+            />
+          ))}
+        </g>
+        {INITIAL_CONTROLS.map(([x, y], index) => (
+          <circle
+            class="bezier-control"
+            data-control-circle={index}
+            cx={x}
+            cy={y}
+            r="4.5"
+          />
+        ))}
+        <circle
+          class="bezier-sample"
+          cx={stages.point[0]}
+          cy={stages.point[1]}
+          r="3.2"
+        />
+      </svg>
+      {INITIAL_CONTROLS.map(([x, y], index) => (
+        <button
+          class="bezier-handle"
+          type="button"
+          aria-label={pointNames[index]}
+          data-control={index}
+          style={`--node-x: ${(x / 440) * 100}%; --node-y: ${(y / 440) * 100}%;`}
+          hidden
+        />
+      ))}
+    </div>
+    <figcaption class="math-art-caption">
+      <div>
+        <span class="math-art-name">Bézier study</span>
+        <span class="math-art-detail">A curve shaped by four points.</span>
+      </div>
+      <div class="bezier-actions" hidden>
+        <button
+          class="math-art-action"
+          type="button"
+          data-bezier-play
+          aria-pressed="false"
+          aria-label="Play Bézier trace"
+        >
+          Play
+        </button>
+        <button
+          class="math-art-action"
+          type="button"
+          data-bezier-reset
+          aria-label="Reset Bézier curve"
+        >
+          Reset
+        </button>
+      </div>
+    </figcaption>
+    <div class="bezier-options" hidden>
+      <label class="bezier-construction-toggle">
+        <input type="checkbox" />
+        Show construction
+      </label>
+      <label class="trace-scrubber">
+        <span>Trace</span>
+        <input
+          type="range"
+          min="0"
+          max="1000"
+          step="1"
+          value={INITIAL_PARAMETER * 1000}
+          aria-label="Bézier trace position"
+        />
+      </label>
+    </div>
+    <p class="math-art-hint" hidden>
+      Drag a point · Arrow keys to adjust · Home to reset a point
+    </p>
+  </figure>
+</bezier-study>
+
+<script>
+  import {
+    INITIAL_CONTROLS,
+    INITIAL_PARAMETER,
+    ribbonGeometry,
+    cubicPath,
+    construction,
+    clampPoint,
+    type ControlPoints,
+  } from "./math-art/bezier";
+  import { path2 } from "./math-art/geometry";
+  import type { Point2 } from "./math-art/geometry";
+
+  class BezierStudy extends HTMLElement {
+    private events?: AbortController;
+
+    connectedCallback() {
+      this.events?.abort();
+      this.events = new AbortController();
+      const { signal } = this.events;
+      const svg = this.querySelector<SVGSVGElement>("[data-bezier-scene]");
+      const main = this.querySelector<SVGPathElement>(".bezier-main");
+      const sample = this.querySelector<SVGCircleElement>(".bezier-sample");
+      const play = this.querySelector<HTMLButtonElement>("[data-bezier-play]");
+      const reset = this.querySelector<HTMLButtonElement>(
+        "[data-bezier-reset]",
+      );
+      const slider = this.querySelector<HTMLInputElement>(
+        'input[type="range"]',
+      );
+      const checkbox = this.querySelector<HTMLInputElement>(
+        'input[type="checkbox"]',
+      );
+      const stagesGroup = this.querySelector<SVGGElement>(
+        "[data-construction]",
+      );
+      if (
+        !svg ||
+        !main ||
+        !sample ||
+        !play ||
+        !reset ||
+        !slider ||
+        !checkbox ||
+        !stagesGroup
+      )
+        return;
+      const motion = matchMedia("(prefers-reduced-motion: reduce)");
+      const controls: ControlPoints = [...INITIAL_CONTROLS];
+      const ribbons = this.querySelectorAll<SVGPathElement>(".bezier-ribbon");
+      const handles =
+        this.querySelectorAll<HTMLButtonElement>("[data-control]");
+      const circles = this.querySelectorAll<SVGCircleElement>(
+        "[data-control-circle]",
+      );
+      const firstPoints =
+        this.querySelectorAll<SVGCircleElement>("[data-first-point]");
+      const secondPoints = this.querySelectorAll<SVGCircleElement>(
+        "[data-second-point]",
+      );
+      const controlPolygon = this.querySelector<SVGPathElement>(
+        ".bezier-control-polygon",
+      )!;
+      const firstLine = this.querySelector<SVGPathElement>(
+        ".bezier-first-level",
+      )!;
+      const secondLine = this.querySelector<SVGPathElement>(
+        ".bezier-second-level",
+      )!;
+      const guides =
+        this.querySelectorAll<SVGPathElement>("[data-handle-line]");
+      let parameter = INITIAL_PARAMETER;
+      let direction = 1;
+      let playing = false;
+      let visible = false;
+      let frame = 0;
+      let previousTime = 0;
+      let geometryDirty = false;
+      let drag: { index: number; pointerId: number } | undefined;
+
+      const moveCircle = (circle: SVGCircleElement, [x, y]: Point2) => {
+        circle.setAttribute("cx", x.toFixed(3));
+        circle.setAttribute("cy", y.toFixed(3));
+      };
+      const draw = () => {
+        if (geometryDirty) {
+          ribbonGeometry(controls).forEach(({ d }, index) =>
+            ribbons[index].setAttribute("d", d),
+          );
+          main.setAttribute("d", cubicPath(controls));
+          controls.forEach((point, index) => {
+            moveCircle(circles[index], point);
+            handles[index].style.setProperty(
+              "--node-x",
+              `${(point[0] / 440) * 100}%`,
+            );
+            handles[index].style.setProperty(
+              "--node-y",
+              `${(point[1] / 440) * 100}%`,
+            );
+            handles[index].setAttribute(
+              "aria-description",
+              `X ${Math.round(point[0])}, Y ${Math.round(point[1])}. Use arrow keys to move; Home resets this point.`,
+            );
+          });
+          guides[0].setAttribute("d", path2(controls.slice(0, 2)));
+          guides[1].setAttribute("d", path2(controls.slice(2, 4)));
+          controlPolygon.setAttribute("d", path2(controls));
+          geometryDirty = false;
+        }
+        const stages = construction(controls, parameter);
+        moveCircle(sample, stages.point);
+        if (checkbox.checked) {
+          firstLine.setAttribute("d", path2(stages.first));
+          secondLine.setAttribute("d", path2(stages.second));
+          stages.first.forEach((point, index) =>
+            moveCircle(firstPoints[index], point),
+          );
+          stages.second.forEach((point, index) =>
+            moveCircle(secondPoints[index], point),
+          );
+        }
+        slider.value = String(Math.round(parameter * 1000));
+        this.dataset.parameter = parameter.toFixed(3);
+      };
+      const canPlay = () =>
+        playing && visible && !document.hidden && !motion.matches && !drag;
+      const tick = (time: number) => {
+        frame = 0;
+        if (canPlay()) {
+          if (previousTime && time - previousTime < 32) {
+            frame = requestAnimationFrame(tick);
+            return;
+          }
+          if (previousTime) {
+            parameter +=
+              (direction * Math.min(80, time - previousTime)) / 13000;
+            if (parameter > 1) {
+              parameter = 2 - parameter;
+              direction = -1;
+            }
+            if (parameter < 0) {
+              parameter = -parameter;
+              direction = 1;
+            }
+          }
+          previousTime = time;
+        }
+        draw();
+        if (canPlay()) frame = requestAnimationFrame(tick);
+      };
+      const requestDraw = () => {
+        if (!frame) frame = requestAnimationFrame(tick);
+      };
+      const refresh = () => {
+        cancelAnimationFrame(frame);
+        frame = 0;
+        previousTime = 0;
+        if (geometryDirty || canPlay()) requestDraw();
+      };
+      const setPlaying = (value: boolean) => {
+        playing = value && !motion.matches;
+        this.dataset.playing = String(playing);
+        play.textContent = playing ? "Pause" : "Play";
+        play.setAttribute(
+          "aria-label",
+          playing ? "Pause Bézier trace" : "Play Bézier trace",
+        );
+        play.setAttribute("aria-pressed", String(playing));
+        refresh();
+      };
+      const setPoint = (index: number, point: Point2) => {
+        controls[index] = clampPoint(point);
+        geometryDirty = true;
+        requestDraw();
+      };
+      const updateDrag = (event: PointerEvent) => {
+        if (!drag || drag.pointerId !== event.pointerId) return;
+        const matrix = svg.getScreenCTM();
+        if (!matrix) return;
+        const point = new DOMPoint(
+          event.clientX,
+          event.clientY,
+        ).matrixTransform(matrix.inverse());
+        setPoint(drag.index, [point.x, point.y]);
+      };
+      handles.forEach((button, index) => {
+        button.hidden = false;
+        button.addEventListener(
+          "pointerdown",
+          (event) => {
+            if (!event.isPrimary || event.button !== 0) return;
+            setPlaying(false);
+            drag = { index, pointerId: event.pointerId };
+            this.dataset.dragging = "true";
+            button.focus({ preventScroll: true });
+            button.setPointerCapture(event.pointerId);
+          },
+          { signal },
+        );
+        button.addEventListener("pointermove", updateDrag, { signal });
+        const endDrag = () => {
+          drag = undefined;
+          delete this.dataset.dragging;
+        };
+        for (const event of [
+          "pointerup",
+          "pointercancel",
+          "lostpointercapture",
+        ])
+          button.addEventListener(event, endDrag, { signal });
+        button.addEventListener(
+          "keydown",
+          (event) => {
+            if (
+              ![
+                "ArrowLeft",
+                "ArrowRight",
+                "ArrowUp",
+                "ArrowDown",
+                "Home",
+              ].includes(event.key)
+            )
+              return;
+            event.preventDefault();
+            setPlaying(false);
+            if (event.key === "Home") {
+              setPoint(index, INITIAL_CONTROLS[index]);
+              return;
+            }
+            const step = event.shiftKey ? 12 : 4;
+            const [x, y] = controls[index];
+            setPoint(index, [
+              x +
+                (event.key === "ArrowLeft"
+                  ? -step
+                  : event.key === "ArrowRight"
+                    ? step
+                    : 0),
+              y +
+                (event.key === "ArrowUp"
+                  ? -step
+                  : event.key === "ArrowDown"
+                    ? step
+                    : 0),
+            ]);
+          },
+          { signal },
+        );
+      });
+      play.addEventListener("click", () => setPlaying(!playing), { signal });
+      reset.addEventListener(
+        "click",
+        () => {
+          setPlaying(false);
+          INITIAL_CONTROLS.forEach((point, index) => {
+            controls[index] = point;
+          });
+          parameter = INITIAL_PARAMETER;
+          direction = 1;
+          checkbox.checked = false;
+          stagesGroup.setAttribute("data-hidden", "");
+          this.removeAttribute("data-show-construction");
+          geometryDirty = true;
+          requestDraw();
+        },
+        { signal },
+      );
+      checkbox.addEventListener(
+        "change",
+        () => {
+          stagesGroup.toggleAttribute("data-hidden", !checkbox.checked);
+          this.toggleAttribute("data-show-construction", checkbox.checked);
+          requestDraw();
+        },
+        { signal },
+      );
+      slider.addEventListener(
+        "input",
+        () => {
+          setPlaying(false);
+          parameter = Number(slider.value) / 1000;
+          requestDraw();
+        },
+        { signal },
+      );
+      for (const selector of [
+        ".bezier-actions",
+        ".bezier-options",
+        ".math-art-hint",
+      ]) {
+        const element = this.querySelector<HTMLElement>(selector);
+        if (element) element.hidden = false;
+      }
+      play.disabled = motion.matches;
+      const observer = new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        refresh();
+      });
+      observer.observe(svg);
+      document.addEventListener("visibilitychange", refresh, { signal });
+      motion.addEventListener(
+        "change",
+        () => {
+          play.disabled = motion.matches;
+          if (motion.matches) setPlaying(false);
+        },
+        { signal },
+      );
+      signal.addEventListener("abort", () => {
+        cancelAnimationFrame(frame);
+        observer.disconnect();
+        if (drag && handles[drag.index].hasPointerCapture(drag.pointerId))
+          handles[drag.index].releasePointerCapture(drag.pointerId);
+      });
+      geometryDirty = true;
+      requestDraw();
+    }
+
+    disconnectedCallback() {
+      this.events?.abort();
+    }
+  }
+  if (!customElements.get("bezier-study"))
+    customElements.define("bezier-study", BezierStudy);
+</script>
