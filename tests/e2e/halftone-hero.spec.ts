@@ -154,19 +154,22 @@ test("a narrow touch screen reveals on tap and preserves vertical scrolling", as
     isMobile: true,
   });
   const page = await context.newPage();
+  await page.clock.install();
   await page.goto("/");
   const stage = page.locator(".halftone-reveal");
   await stage.scrollIntoViewIfNeeded();
   await expect(stage).toHaveAttribute("data-ready", "true");
   await expect(stage).toHaveCSS("touch-action", "pan-y");
-  await page.waitForTimeout(1700);
+  // Freeze a completed intro, then advance the tap animation explicitly.
+  // A slow CI screenshot must not let the short-lived ripple expire first.
+  await page.clock.pauseAt(await page.evaluate(() => Date.now() + 1700));
   const before = await stage.locator("canvas").screenshot();
   const bounds = (await stage.boundingBox())!;
   await page.touchscreen.tap(
     bounds.x + bounds.width * 0.5,
     bounds.y + bounds.height * 0.35,
   );
-  await page.waitForTimeout(150);
+  await page.clock.runFor(160);
   expect((await stage.locator("canvas").screenshot()).equals(before)).toBe(
     false,
   );
