@@ -250,7 +250,7 @@ test("Home keeps results on About on desktop and mobile without JavaScript", asy
   ]) {
     await page.setViewportSize(viewport);
     await page.goto("/");
-    await expect(page).toHaveTitle("Yukino — Learning & making");
+    await expect(page).toHaveTitle("Yukino — Hackers & Painters");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     const snapshot = page.getByRole("region", { name: "Academic Snapshot" });
     await expect(snapshot).toHaveCount(0);

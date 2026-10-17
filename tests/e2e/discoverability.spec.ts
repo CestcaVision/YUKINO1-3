@@ -11,7 +11,7 @@ interface PublishedRoute {
 const publishedRoutes: PublishedRoute[] = [
   {
     path: "/",
-    pageTitle: "Yukino — Learning & making",
+    pageTitle: "Yukino — Hackers & Painters",
     description:
       "A personal collection of things I’m learning and making: notes, small experiments, and projects in mathematics and computing.",
     type: "website",

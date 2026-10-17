@@ -144,13 +144,25 @@ main {
   align-items: center;
   border-bottom: 1px solid var(--color-line);
   display: grid;
-  gap: clamp(3rem, 6vw, 7rem);
-  grid-template-columns: minmax(0, 1.2fr) minmax(18rem, 0.8fr);
-  min-height: min(42rem, calc(100vh - 5rem));
-  padding: clamp(4.5rem, 10vh, 8rem) 0;
+  gap: clamp(3rem, 5vw, 6rem);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: min(54rem, calc(100svh - 5rem));
+  padding: 3rem 0;
 }
 
-.hero h1,
+.hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 10vw, 10rem);
+  font-weight: 430;
+  letter-spacing: -0.055em;
+  line-height: 0.88;
+  margin: 0;
+}
+
+.hero h1 span {
+  display: block;
+}
+
 .page-title {
   font-family: var(--font-display);
   font-size: clamp(3.8rem, 7.2vw, 7.5rem);
@@ -161,22 +173,91 @@ main {
   max-width: 12ch;
 }
 
-.hero h1::after {
-  color: var(--color-accent);
-  content: "";
+.hero-copy .hero-introduction {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3.3vw, 3.25rem);
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  margin: 2rem 0 0;
+  max-width: 23ch;
 }
 
-.hero-copy > p {
-  font-size: clamp(1rem, 1.35vw, 1.25rem);
+.hero-description {
+  font-size: clamp(1rem, 1.2vw, 1.125rem);
   line-height: 1.55;
-  margin: 2.5rem 0 0;
-  max-width: 38rem;
+  margin: 1.75rem 0 0;
+  max-width: 36rem;
 }
 
-.hero-plot {
-  align-self: stretch;
+.hero-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem 2rem;
+  font-size: 0.95rem;
+  margin-top: 1.75rem;
+}
+
+.hero-primary-link {
+  background: var(--color-accent);
+  color: var(--color-paper);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3.25rem;
+  padding: 0.875rem 1.4rem;
+  font-weight: 400;
+  text-decoration: none;
+  transition: background 160ms ease;
+}
+
+.hero-primary-link:hover {
+  background: #173ca5;
+  color: var(--color-paper);
+}
+
+.works-showcase {
+  align-items: center;
+  border-bottom: 1px solid var(--color-line);
   display: grid;
-  place-items: center;
+  gap: clamp(3rem, 5vw, 6rem);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  padding: clamp(3.5rem, 7vw, 7rem) 0;
+}
+
+.works-showcase h2 {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 5.5vw, 5.5rem);
+  font-weight: 430;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+  margin: 0;
+  max-width: 13ch;
+  scroll-margin-top: 2rem;
+}
+
+.works-introduction {
+  font-size: 1.125rem;
+  line-height: 1.6;
+  margin: 1.5rem 0 0;
+  max-width: 33rem;
+}
+
+.works-showcase .home-evidence {
+  border-top: 1px solid var(--color-line);
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+}
+
+.works-showcase-visual {
+  display: grid;
+  justify-items: end;
+}
+
+@media (min-width: 56.01rem) {
+  .hero + .works-showcase {
+    padding-top: 2.5rem;
+  }
 }
 
 .plot-motif {
@@ -873,6 +954,19 @@ main {
     padding: 4rem 0 3rem;
   }
 
+  .hero h1 {
+    font-size: clamp(5rem, 20vw, 7rem);
+  }
+
+  .works-showcase {
+    gap: 2rem;
+    grid-template-columns: 1fr;
+  }
+
+  .works-showcase-visual {
+    justify-items: center;
+  }
+
   .preview-page {
     gap: 2rem;
     grid-template-columns: 1fr;
@@ -895,13 +989,8 @@ main {
     max-width: 12rem;
   }
 
-  .hero h1,
   .page-title {
     font-size: clamp(3.4rem, 17vw, 5.5rem);
-  }
-
-  .hero-plot {
-    justify-items: end;
   }
 
   .plot-motif {

@@ -1,0 +1,317 @@
+---
+import {
+  traceGeometry,
+  traceProjection,
+  traceTail,
+  traceBookmarks,
+  trajectory,
+} from "./math-art/lorenz";
+import "./section-sketches.css";
+interface Props {
+  items: { title: string }[];
+}
+const { items } = Astro.props;
+const curves = traceGeometry();
+const points = traceProjection();
+const bookmarks = traceBookmarks(items.length);
+const position = bookmarks[0] ?? 560;
+const tail = traceTail(points, position);
+---
+
+<lorenz-trace data-position={position} data-playing="false">
+  <figure class="math-art">
+    <div class="math-art-stage">
+      <svg
+        class="math-art-scene"
+        viewBox="0 0 440 440"
+        role="img"
+        aria-label="A blue Lorenz attractor: a continuous trajectory winding around two lobes"
+        data-trace-scene
+      >
+        {curves.map(({ d, opacity }) => (
+          <path class="trace-orbit" d={d} opacity={opacity * 0.75} />
+        ))}
+        <path class="trace-tail" d={tail.d} />
+        <circle
+          class="trace-head"
+          cx={tail.point[0]}
+          cy={tail.point[1]}
+          r="3"
+        />
+        {bookmarks.map((index, bookmark) => (
+          <circle
+            class="trace-bookmark"
+            cx={points[index][0]}
+            cy={points[index][1]}
+            r="5"
+            data-marker={bookmark}
+          />
+        ))}
+      </svg>
+      {bookmarks.map((index, bookmark) => (
+        <button
+          class="trace-node"
+          type="button"
+          data-trace-node={bookmark}
+          data-position={index}
+          aria-label={`Locate update: ${items[bookmark].title}`}
+          aria-controls={`recent-activity-${bookmark}`}
+          style={`--node-x: ${(points[index][0] / 440) * 100}%; --node-y: ${(points[index][1] / 440) * 100}%;`}
+          hidden
+        />
+      ))}
+    </div>
+    <figcaption class="math-art-caption">
+      <div>
+        <span class="math-art-name">A trace of time</span>
+        <span class="math-art-detail">Lorenz attractor</span>
+      </div>
+      <button
+        class="math-art-action"
+        type="button"
+        data-play
+        aria-pressed="false"
+        hidden
+      >
+        Play trace
+      </button>
+    </figcaption>
+    <label class="trace-scrubber" hidden>
+      <span>Time</span>
+      <input
+        type="range"
+        aria-label="Trace position"
+        min="0"
+        max={trajectory.length - 1}
+        step="1"
+        value={position}
+      />
+    </label>
+    <p class="math-art-hint" hidden>
+      Drag to turn · Scrub to follow · Tap a point to find an update
+    </p>
+  </figure>
+</lorenz-trace>
+
+<script>
+  import {
+    traceGeometry,
+    traceProjection,
+    traceTail,
+    trajectory,
+  } from "./math-art/lorenz";
+  import { TRACE_VIEW } from "./math-art/geometry";
+  import { attachRotation } from "./math-art/rotation";
+
+  class LorenzTrace extends HTMLElement {
+    private events?: AbortController;
+
+    connectedCallback() {
+      this.events?.abort();
+      this.events = new AbortController();
+      const { signal } = this.events;
+      const svg = this.querySelector<SVGSVGElement>("[data-trace-scene]");
+      const tail = this.querySelector<SVGPathElement>(".trace-tail");
+      const head = this.querySelector<SVGCircleElement>(".trace-head");
+      const play = this.querySelector<HTMLButtonElement>("[data-play]");
+      const slider = this.querySelector<HTMLInputElement>("input");
+      const section = this.closest("section");
+      if (!svg || !tail || !head || !play || !slider || !section) return;
+      const motion = matchMedia("(prefers-reduced-motion: reduce)");
+      const view = { ...TRACE_VIEW };
+      let points = traceProjection(view);
+      let position = Number(this.dataset.position);
+      let playing = false;
+      let visible = false;
+      let frame = 0;
+      let previousTime = 0;
+      let orbitDirty = false;
+      let selected: number | null = null;
+      const orbit = this.querySelectorAll<SVGPathElement>(".trace-orbit");
+      const buttons =
+        this.querySelectorAll<HTMLButtonElement>("[data-trace-node]");
+      const markers = this.querySelectorAll<SVGCircleElement>("[data-marker]");
+      const entries = section.querySelectorAll<HTMLElement>(
+        "[data-activity-entry]",
+      );
+
+      const draw = () => {
+        if (orbitDirty) {
+          points = traceProjection(view);
+          traceGeometry(view).forEach(({ d, opacity }, index) => {
+            orbit[index].setAttribute("d", d);
+            orbit[index].setAttribute("opacity", String(opacity * 0.75));
+          });
+          buttons.forEach((button, index) => {
+            const point = points[Number(button.dataset.position)];
+            button.style.setProperty("--node-x", `${(point[0] / 440) * 100}%`);
+            button.style.setProperty("--node-y", `${(point[1] / 440) * 100}%`);
+            markers[index].setAttribute("cx", String(point[0]));
+            markers[index].setAttribute("cy", String(point[1]));
+          });
+          orbitDirty = false;
+        }
+        const segment = traceTail(points, position);
+        tail.setAttribute("d", segment.d);
+        head.setAttribute("cx", String(segment.point[0]));
+        head.setAttribute("cy", String(segment.point[1]));
+        slider.value = String(Math.round(position));
+        this.dataset.position = String(Math.round(position));
+      };
+      const canPlay = () =>
+        playing && visible && !document.hidden && !motion.matches;
+      const tick = (time: number) => {
+        frame = 0;
+        if (canPlay()) {
+          if (previousTime && time - previousTime < 32) {
+            frame = requestAnimationFrame(tick);
+            return;
+          }
+          if (previousTime)
+            position =
+              (position + Math.min(80, time - previousTime) * 0.095) %
+              trajectory.length;
+          previousTime = time;
+        }
+        draw();
+        if (canPlay()) frame = requestAnimationFrame(tick);
+      };
+      const requestDraw = () => {
+        if (!frame) frame = requestAnimationFrame(tick);
+      };
+      const refresh = () => {
+        cancelAnimationFrame(frame);
+        frame = 0;
+        previousTime = 0;
+        if (canPlay()) requestDraw();
+      };
+      const setPlaying = (value: boolean) => {
+        playing = value && !motion.matches;
+        this.dataset.playing = String(playing);
+        play.textContent = playing ? "Pause trace" : "Play trace";
+        play.setAttribute("aria-pressed", String(playing));
+        refresh();
+      };
+      const select = (index: number | null) => {
+        if (selected === index) return;
+        selected = index;
+        markers.forEach((marker, markerIndex) =>
+          marker.toggleAttribute("data-active", markerIndex === index),
+        );
+        entries.forEach((entry, entryIndex) =>
+          entry.toggleAttribute("data-trace-active", entryIndex === index),
+        );
+        if (index !== null) {
+          setPlaying(false);
+          position = Number(buttons[index].dataset.position);
+          requestDraw();
+        }
+      };
+      const indexFor = (target: EventTarget | null) => {
+        if (!(target instanceof Element)) return null;
+        const entry = target.closest<HTMLElement>(
+          "[data-activity-entry], [data-trace-node]",
+        );
+        if (!entry || !section.contains(entry)) return null;
+        const index = Number(
+          entry.dataset.activityEntry ?? entry.dataset.traceNode,
+        );
+        return index < buttons.length ? index : null;
+      };
+      attachRotation(
+        svg,
+        view,
+        TRACE_VIEW,
+        () => {
+          orbitDirty = true;
+          requestDraw();
+        },
+        signal,
+      );
+      play.hidden = false;
+      const scrubber = this.querySelector<HTMLElement>(".trace-scrubber");
+      const hint = this.querySelector<HTMLElement>(".math-art-hint");
+      if (scrubber) scrubber.hidden = false;
+      if (hint) hint.hidden = false;
+      play.disabled = motion.matches;
+      play.addEventListener(
+        "click",
+        () => {
+          select(null);
+          setPlaying(!playing);
+        },
+        { signal },
+      );
+      slider.addEventListener(
+        "input",
+        () => {
+          setPlaying(false);
+          select(null);
+          position = Number(slider.value);
+          requestDraw();
+        },
+        { signal },
+      );
+      section.addEventListener(
+        "pointerover",
+        (event) => select(indexFor(event.target)),
+        { signal },
+      );
+      section.addEventListener(
+        "pointerleave",
+        () => select(indexFor(document.activeElement)),
+        { signal },
+      );
+      section.addEventListener(
+        "focusin",
+        (event) => select(indexFor(event.target)),
+        { signal },
+      );
+      section.addEventListener(
+        "focusout",
+        (event) => select(indexFor(event.relatedTarget)),
+        { signal },
+      );
+      buttons.forEach((button, index) => {
+        button.hidden = false;
+        button.addEventListener(
+          "click",
+          () => {
+            const entry = entries[index];
+            if (!entry) return;
+            entry.focus({ preventScroll: true });
+            entry.scrollIntoView({
+              behavior: motion.matches ? "instant" : "smooth",
+              block: "center",
+            });
+          },
+          { signal },
+        );
+      });
+      const observer = new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        refresh();
+      });
+      observer.observe(svg);
+      document.addEventListener("visibilitychange", refresh, { signal });
+      motion.addEventListener(
+        "change",
+        () => {
+          play.disabled = motion.matches;
+          if (motion.matches) setPlaying(false);
+        },
+        { signal },
+      );
+      signal.addEventListener("abort", () => {
+        cancelAnimationFrame(frame);
+        observer.disconnect();
+      });
+    }
+
+    disconnectedCallback() {
+      this.events?.abort();
+    }
+  }
+  if (!customElements.get("lorenz-trace"))
+    customElements.define("lorenz-trace", LorenzTrace);
+</script>

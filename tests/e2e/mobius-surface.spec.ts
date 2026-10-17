@@ -7,6 +7,7 @@ test("the surface rotates, pauses, and responds to dragging and the keyboard", a
 }) => {
   await page.goto("/");
   const surface = page.getByRole("img", { name: surfaceLabel });
+  await surface.scrollIntoViewIfNeeded();
   const edge = surface.locator(".surface-edge");
   await expect(
     page.getByRole("button", { name: "Pause animation" }),
@@ -59,8 +60,9 @@ test("reduced motion keeps the surface still while allowing deliberate rotation"
 }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
-  await expect(page.getByRole("button", { name: "Motion off" })).toBeDisabled();
   const surface = page.getByRole("img", { name: surfaceLabel });
+  await surface.scrollIntoViewIfNeeded();
+  await expect(page.getByRole("button", { name: "Motion off" })).toBeDisabled();
   const edge = surface.locator(".surface-edge");
   const face = surface.locator('[data-face="123"]');
   const initialColour = await face.getAttribute("fill");
