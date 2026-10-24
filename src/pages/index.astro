@@ -1,6 +1,9 @@
 ---
 import { sitePath } from "../site-path";
 import MobiusSurface from "../components/MobiusSurface";
+import HalftoneHero from "../components/HalftoneHero";
+import BezierStudy from "../components/BezierStudy.astro";
+import LorenzTrace from "../components/LorenzTrace.astro";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { getCollection } from "astro:content";
 
@@ -33,6 +36,9 @@ const evidence = [
 // Feature the most recently published Work; no inferred claim of quality or ranking.
 const featuredWork = evidence.find((item) => item.kind === "Work");
 const latestNote = evidence.find((item) => item.kind === "Note");
+// Replace this file with your own image, or change this path. Keep it local
+// so the hero works without a third-party image host or CORS permissions.
+const heroImage = sitePath("/images/hero-halftone.png");
 const activity = [
   ...evidence,
   ...milestones.map(({ id, data }) => ({
@@ -55,61 +61,99 @@ const activity = [
 >
   <section class="hero" aria-labelledby="hero-title">
     <div class="hero-copy">
-      <h1 id="hero-title">A place for things I’m learning and making.</h1>
-      <p>
+      <h1 id="hero-title">
+        Hi, I’m <span>Yukino.</span>
+      </h1>
+      <p class="hero-introduction">
+        A place for things I’m learning and making.
+      </p>
+      <p class="hero-description">
         This is where I keep notes from what I’m learning, share things I’ve
         made, and follow questions that catch my attention. Most of them start
         with maths or code; sometimes the interesting part is where they lead.
       </p>
+      <div class="hero-actions">
+        <a class="hero-primary-link" href="#featured-work">
+          Explore my work
+        </a>
+        <a href={sitePath("/about/")}>More about me</a>
+      </div>
     </div>
-    <div class="hero-plot">
+    <HalftoneHero
+      client:load
+      src={heroImage}
+      alt="Blue-haired character illustration from the Halftone Reveal demo"
+      fit="contain"
+      inkColor="#0d0d0d"
+      cellSize={6}
+      revealRadius={160}
+    />
+  </section>
+
+  <section class="works-showcase" aria-labelledby="featured-work">
+    <div class="works-showcase-copy">
+      <h2 id="featured-work">Something I’ve made</h2>
+      <p class="works-introduction">
+        Small experiments in maths and code. A place to try an idea, turn it
+        around, and see where it leads.
+      </p>
+      <div class="home-evidence">
+        {featuredWork ? (
+          <article>
+            <p class="note-meta">{featuredWork.subject}</p>
+            <h3>
+              <a href={sitePath(featuredWork.href)}>{featuredWork.title}</a>
+            </h3>
+            <p>{featuredWork.summary}</p>
+          </article>
+        ) : (
+          <p>I’ll share my first project here when it’s ready.</p>
+        )}
+        <a href={sitePath("/works/")}>See all my work</a>
+      </div>
+    </div>
+    <div class="works-showcase-visual">
       <MobiusSurface client:visible />
     </div>
   </section>
 
-  {[
-    {
-      id: "featured-work",
-      title: "Something I’ve made",
-      item: featuredWork,
-      href: "/works/",
-      link: "See all my work",
-      empty: "I’ll share my first project here when it’s ready.",
-    },
-    {
-      id: "latest-note",
-      title: "From my notebook",
-      item: latestNote,
-      href: "/notes/",
-      link: "Read all notes",
-      empty: "I’m still putting my first notes together. More soon.",
-    },
-  ].map(({ id, title, item, href, link, empty }) => (
-    <section class="evidence-section" aria-labelledby={id}>
-      <h2 id={id}>{title}</h2>
-      <div class="home-evidence">
-        {item ? (
-          <article>
-            <p class="note-meta">{item.subject}</p>
-            <h3>
-              <a href={sitePath(item.href)}>{item.title}</a>
-            </h3>
-            <p>{item.summary}</p>
-          </article>
-        ) : (
-          <p>{empty}</p>
-        )}
-        <a href={sitePath(href)}>{link}</a>
-      </div>
-    </section>
-  ))}
+  <section
+    class="evidence-section notebook-section"
+    aria-labelledby="latest-note"
+  >
+    <div class="section-art-column">
+      <h2 id="latest-note">From my notebook</h2>
+      <BezierStudy />
+    </div>
+    <div class="home-evidence">
+      {latestNote ? (
+        <article>
+          <p class="note-meta">{latestNote.subject}</p>
+          <h3>
+            <a href={sitePath(latestNote.href)}>{latestNote.title}</a>
+          </h3>
+          <p>{latestNote.summary}</p>
+        </article>
+      ) : (
+        <p>I’m still putting my first notes together. More soon.</p>
+      )}
+      <a href={sitePath("/notes/")}>Read all notes</a>
+    </div>
+  </section>
 
   <section class="activity-section" aria-labelledby="activity-title">
-    <h2 id="activity-title">Lately</h2>
+    <div class="section-art-column">
+      <h2 id="activity-title">Lately</h2>
+      <LorenzTrace items={activity} />
+    </div>
     {activity.length > 0 ? (
       <ol class="activity-list">
-        {activity.map((item) => (
-          <li>
+        {activity.map((item, index) => (
+          <li
+            id={`recent-activity-${index}`}
+            data-activity-entry={index}
+            tabindex="-1"
+          >
             <div class="note-meta">
               <time datetime={item.date.toISOString()}>
                 {item.date.toLocaleDateString("en-GB", {
@@ -139,6 +183,12 @@ const activity = [
 </BaseLayout>
 
 <style>
+  .section-art-column {
+    min-width: 0;
+  }
+  .notebook-section .home-evidence {
+    align-self: center;
+  }
   .home-evidence h3,
   .activity-list h3 {
     font-family: var(--font-display);

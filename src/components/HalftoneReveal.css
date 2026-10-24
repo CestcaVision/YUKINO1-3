@@ -1,0 +1,81 @@
+.halftone-portrait {
+  margin: 0;
+  min-width: 0;
+  width: 100%;
+}
+
+.halftone-reveal {
+  aspect-ratio: 1 / 1.16;
+  overflow: hidden;
+  position: relative;
+  touch-action: pan-y;
+  width: 100%;
+}
+
+.halftone-reveal-image,
+.halftone-reveal-canvas {
+  display: block;
+  height: 100%;
+  inset: 0;
+  position: absolute;
+  width: 100%;
+}
+
+.halftone-reveal-canvas {
+  opacity: 0;
+}
+
+.halftone-reveal[data-ready] .halftone-reveal-canvas {
+  opacity: 1;
+}
+
+.halftone-portrait[data-original="true"] .halftone-reveal-canvas {
+  opacity: 0;
+}
+
+.halftone-reveal-controls {
+  align-items: center;
+  border-top: 1px solid var(--color-line);
+  color: var(--color-muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-family: var(--font-ui);
+  font-size: 0.825rem;
+  gap: 0.25rem 1rem;
+  justify-content: space-between;
+  min-height: 2.75rem;
+  visibility: hidden;
+}
+
+.halftone-portrait:has(.halftone-reveal[data-ready]) .halftone-reveal-controls {
+  visibility: visible;
+}
+
+.halftone-reveal-controls button {
+  background: transparent;
+  border: 0;
+  color: var(--color-ink);
+  cursor: pointer;
+  font: inherit;
+  min-height: 2.75rem;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.halftone-reveal-controls button:hover {
+  color: var(--color-accent);
+}
+
+@media (hover: hover) {
+  .halftone-reveal[data-ready] {
+    cursor: crosshair;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .halftone-reveal-canvas,
+  .halftone-reveal-controls {
+    visibility: hidden !important;
+  }
+}
