@@ -45,15 +45,15 @@ const { data } = note;
       </div>
       <div>
         <dt>Subject</dt>
-        <dd>{data.subject}</dd>
+        <dd>{data.subject ?? "Pending classification"}</dd>
       </div>
       <div>
         <dt>Medium</dt>
-        <dd>{data.media.join(", ")}</dd>
+        <dd>{data.media?.join(", ") || "Pending classification"}</dd>
       </div>
       <div>
         <dt>Capability</dt>
-        <dd>{data.capabilities.join(", ")}</dd>
+        <dd>{data.capabilities?.join(", ") || "Pending classification"}</dd>
       </div>
       {data.updated && (
         <div>

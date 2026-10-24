@@ -28,7 +28,13 @@ const showDrafts = import.meta.env.DEV;
         </a>
       )}
     </header>
-    <EvidenceFilters items={notes.map(({ data }) => data)}>
+    <EvidenceFilters
+      items={notes.map(({ data }) => ({
+        subject: data.subject ?? "",
+        media: data.media ?? [],
+        capabilities: data.capabilities ?? [],
+      }))}
+    >
       <ol class="note-list">
         {notes.map(({ data }) => (
           <li

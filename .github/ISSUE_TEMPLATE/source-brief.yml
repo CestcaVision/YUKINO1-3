@@ -1,0 +1,76 @@
+name: Source Brief
+description: >-
+  Submit your own material for a new Note. Repository owner (or an
+  explicitly approved actor) only — anyone else's submission is rejected
+  automatically and no content is changed.
+title: "Note: "
+labels:
+  - source-brief
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Submitting this form opens a pull request with a single Draft Note.
+        It is never published directly — see
+        [ADR 0001](../../docs/adr/0001-human-approved-automated-publication.md).
+        Every field below must be your own material: your own question,
+        your own preliminary explanation, and so on. Classification
+        (Subject, Medium, Capability) is recommended automatically from a
+        controlled vocabulary — you do not choose it here, and an uncertain
+        recommendation is marked pending for you to confirm before
+        publishing. See `docs/notes-automation.md`.
+  - type: input
+    id: title
+    attributes:
+      label: Title
+      description: A working title for the Note. You can change it before merging.
+      placeholder: "Why does completing the square work?"
+    validations:
+      required: true
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+      description: The question this Note should answer, in your own words.
+      placeholder: What I actually want to understand is...
+    validations:
+      required: true
+  - type: textarea
+    id: explanation
+    attributes:
+      label: Your own preliminary explanation
+      description: >-
+        Your own attempt at explaining it, however incomplete. This is the
+        core material the Draft Note is built from.
+    validations:
+      required: true
+  - type: textarea
+    id: example
+    attributes:
+      label: Example or derivation
+      description: A worked example, derivation, or concrete case you worked through.
+    validations:
+      required: true
+  - type: textarea
+    id: uncertainties
+    attributes:
+      label: Uncertainties
+      description: What you are still unsure about or might have gotten wrong.
+    validations:
+      required: true
+  - type: textarea
+    id: assistance
+    attributes:
+      label: Requested assistance
+      description: What kind of help you want with this Note (structure, checking, wording, ...).
+    validations:
+      required: true
+  - type: textarea
+    id: allowed-sources
+    attributes:
+      label: Allowed source scope
+      description: >-
+        What sources are allowed to be checked against or cited (e.g. "my
+        own classroom notes only", "any public textbook").
+    validations:
+      required: true

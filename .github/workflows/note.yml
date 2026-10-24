@@ -1,0 +1,191 @@
+name: Draft Note from Issue
+
+# Issue text is untrusted input. It is only ever used as inert frontmatter
+# field values and Markdown body content (see scripts/note/) or passed
+# through jq/file arguments below — never interpolated into a shell command
+# via `${{ }}`. Classification uses deterministic keyword matching only; no
+# generative AI is used by this workflow (see scripts/note/).
+on:
+  issues:
+    types: [opened]
+
+concurrency:
+  group: note-issue-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  process:
+    name: Process Source Brief issue
+    if: contains(github.event.issue.labels.*.name, 'source-brief')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    outputs:
+      status: ${{ steps.decide.outputs.status }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: 12.4.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Look up an existing pull request for this issue
+        id: existing-pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH_NAME: note/issue-${{ github.event.issue.number }}
+        run: |
+          set -euo pipefail
+          pr_json=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$BRANCH_NAME" --state all --json number,url,state --jq '.[0] // {}')
+          {
+            echo "number=$(echo "$pr_json" | jq -r '.number // empty')"
+            echo "url=$(echo "$pr_json" | jq -r '.url // empty')"
+            echo "state=$(echo "$pr_json" | jq -r '.state // empty')"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Decide what to do
+        id: decide
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_CREATED_AT: ${{ github.event.issue.created_at }}
+          ISSUE_USER_LOGIN: ${{ github.event.issue.user.login }}
+          ISSUE_AUTHOR_ASSOCIATION: ${{ github.event.issue.author_association }}
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
+          APPROVED_ACTORS: ${{ vars.NOTE_APPROVED_ACTORS }}
+          EXISTING_PR_NUMBER: ${{ steps.existing-pr.outputs.number }}
+          EXISTING_PR_URL: ${{ steps.existing-pr.outputs.url }}
+          EXISTING_PR_STATE: ${{ steps.existing-pr.outputs.state }}
+        run: |
+          set -euo pipefail
+          node scripts/note/cli.ts > decision.json
+          echo "status=$(jq -r '.status' decision.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Comment when unauthorized, invalid, or already processed
+        if: steps.decide.outputs.status != 'ready'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          set -euo pipefail
+          jq -r '.comment' decision.json > comment.md
+          gh issue comment "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file comment.md
+
+      - name: Create the branch and commit the Draft Note
+        if: steps.decide.outputs.status == 'ready'
+        run: |
+          set -euo pipefail
+          branch=$(jq -r '.branchName' decision.json)
+          file_path=$(jq -r '.filePath' decision.json)
+          git checkout -b "$branch"
+          mkdir -p "$(dirname "$file_path")"
+          jq -r '.fileContent' decision.json > "$file_path"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "$file_path"
+          jq -r '.commitMessage' decision.json | git commit -F -
+          # Force-push is safe: this branch is bot-owned and its content is a
+          # deterministic function of the issue, so re-pushing after a partial
+          # prior run (branch created, PR step never ran) reproduces the same
+          # result rather than overwriting anything else.
+          git push --force origin "$branch"
+
+      - name: Open the pull request
+        if: steps.decide.outputs.status == 'ready'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          set -euo pipefail
+          branch=$(jq -r '.branchName' decision.json)
+          jq -r '.prBody' decision.json > pr-body.md
+          pr_url=$(gh pr create --repo "$GITHUB_REPOSITORY" \
+            --title "$(jq -r '.prTitle' decision.json)" \
+            --body-file pr-body.md \
+            --base main \
+            --head "$branch")
+          printf 'Opened a pull request with this Draft Note: %s\n\nIt will not appear on the site until reviewed and merged (ADR 0001).\n' "$pr_url" > issue-comment.md
+          gh issue comment "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --body-file issue-comment.md
+
+  ai-review:
+    name: Optional private AI review (Generated Article)
+    needs: process
+    # An explicit `if:` replaces the implicit `success()` GitHub Actions
+    # would otherwise require of `needs: process` — restore it, so a
+    # `process` failure after `decide` already set status=ready (e.g. the
+    # branch push or `gh pr create` step failing) can't still trigger this
+    # job.
+    if: success() && needs.process.outputs.status == 'ready'
+    runs-on: ubuntu-latest
+    # A separate, restricted environment scopes the AI credential and lets
+    # the repository require reviewer approval before this job can run —
+    # the closest GitHub Actions gets to a "permission-controlled" run for
+    # a job whose output must stay a private review artifact (see
+    # docs/ai-review.md for the residual limits of that on a public repo).
+    environment: ai-review
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+        with:
+          version: 12.4.1
+
+      - name: Set up Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Restore monthly AI usage state
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+        with:
+          path: .ai-review/usage.json
+          key: ai-review-usage-${{ github.run_id }}
+          restore-keys: ai-review-usage-
+
+      - name: Run the optional AI review
+        id: run
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          AI_PROVIDER: ${{ vars.AI_PROVIDER }}
+          AI_API_KEY: ${{ secrets.AI_API_KEY }}
+          AI_MODEL: ${{ vars.AI_MODEL }}
+          AI_MAX_CALLS_PER_RUN: ${{ vars.AI_MAX_CALLS_PER_RUN }}
+          AI_MAX_CALLS_PER_PERIOD: ${{ vars.AI_MAX_CALLS_PER_PERIOD }}
+        run: |
+          set -euo pipefail
+          node scripts/ai-review/cli.ts | tee ai-review-status.json
+          echo "status=$(jq -r '.status' ai-review-status.json)" >> "$GITHUB_OUTPUT"
+
+      - name: Upload the private review artifact
+        if: steps.run.outputs.status == 'completed'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: ai-review-issue-${{ github.event.issue.number }}
+          path: ai-review-output/
+          retention-days: 14
+          if-no-files-found: ignore

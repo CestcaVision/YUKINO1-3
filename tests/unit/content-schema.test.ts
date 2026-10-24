@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { ZodType } from "astro/zod";
 import { collections } from "../../src/content.config";
+import { noteSchema } from "../../src/schemas/note";
 
 // Every collection here defines `schema` as a static Zod object rather than
 // the context-dependent function form Astro's type also allows.
@@ -29,6 +30,17 @@ const baseWork = {
     validation: "v",
     limitations: "l",
   },
+};
+
+const baseNote = {
+  title: "A note",
+  summary: "A summary",
+  slug: "a-note",
+  date: "2026-01-01",
+  lifecycle: "published",
+  subject: "Mathematics",
+  media: ["Written explanation"],
+  capabilities: ["Explains a mathematical idea"],
 };
 
 const baseAcademicResult = {
@@ -68,6 +80,67 @@ describe("work schema", () => {
       updated: "2026-06-01",
     });
     expect(result.success).toBe(true);
+  });
+});
+
+describe("note schema", () => {
+  it("accepts a well-formed, confirmed, published Note", () => {
+    expect(parse("notes", baseNote).success).toBe(true);
+  });
+
+  it("defaults classification to confirmed", () => {
+    const result = noteSchema.safeParse(baseNote);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.classification).toBe("confirmed");
+    }
+  });
+
+  it("accepts a pending, unclassified draft Note", () => {
+    const result = parse("notes", {
+      title: "A note",
+      summary: "A summary",
+      slug: "a-note",
+      date: "2026-01-01",
+      lifecycle: "draft",
+      classification: "pending",
+    });
+    expect(result.success).toBe(true);
+  });
+
+  it("rejects a pending, unclassified Note if it is published", () => {
+    const result = parse("notes", {
+      title: "A note",
+      summary: "A summary",
+      slug: "a-note",
+      date: "2026-01-01",
+      lifecycle: "published",
+      classification: "pending",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a published Note missing subject, media, or capabilities even without an explicit pending classification", () => {
+    const result = parse("notes", {
+      title: "A note",
+      summary: "A summary",
+      slug: "a-note",
+      date: "2026-01-01",
+      lifecycle: "published",
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("rejects a confirmed classification missing subject, media, or capabilities", () => {
+    const result = parse("notes", {
+      title: "A note",
+      summary: "A summary",
+      slug: "a-note",
+      date: "2026-01-01",
+      lifecycle: "draft",
+      classification: "confirmed",
+    });
+    expect(result.success).toBe(false);
   });
 });
 

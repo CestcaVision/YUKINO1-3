@@ -44,10 +44,12 @@ test("draft and review Notes have no production surface", async ({
 
   await expect(page.getByText("Hidden draft Note")).toHaveCount(0);
   await expect(page.getByText("Hidden review Note")).toHaveCount(0);
+  await expect(page.getByText("Hidden pending Note")).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Preview drafts" })).toHaveCount(
     0,
   );
   expect((await request.get("/notes/drafts/")).status()).toBe(404);
   expect((await request.get("/notes/hidden-draft/")).status()).toBe(404);
   expect((await request.get("/notes/hidden-review/")).status()).toBe(404);
+  expect((await request.get("/notes/hidden-pending/")).status()).toBe(404);
 });

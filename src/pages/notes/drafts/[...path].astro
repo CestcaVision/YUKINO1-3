@@ -58,7 +58,7 @@ const isIndex = props.kind === "index";
             <article>
               <div class="note-meta">
                 <span>{data.lifecycle}</span>
-                <span>{data.subject}</span>
+                <span>{data.subject ?? "Pending classification"}</span>
               </div>
               <h2>
                 <a href={sitePath(`/notes/drafts/${data.slug}/`)}>

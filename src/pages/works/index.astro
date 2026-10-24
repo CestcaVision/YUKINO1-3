@@ -21,7 +21,7 @@ const evidence = [
   ...notes.map((note) => ({
     title: note.data.title,
     href: `/notes/${note.data.slug}/`,
-    capabilities: note.data.capabilities,
+    capabilities: note.data.capabilities ?? [],
   })),
 ];
 const capabilities = [

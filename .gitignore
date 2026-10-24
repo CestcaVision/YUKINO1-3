@@ -3,3 +3,5 @@ dist/
 .astro/
 playwright-report/
 test-results/
+.ai-review/
+ai-review-output/

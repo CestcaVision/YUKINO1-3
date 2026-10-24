@@ -1,0 +1,84 @@
+name: Academic Result
+description: >-
+  Record an achieved or officially predicted Academic Result. Repository
+  owner (or an explicitly approved actor) only — anyone else's submission is
+  rejected automatically and no content is changed.
+title: "Academic Result: "
+labels:
+  - academic-result
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Submitting this form opens a pull request with a single new Academic
+        Result file. It is never published directly — see
+        [ADR 0001](../../docs/adr/0001-human-approved-automated-publication.md).
+        Review `docs/academic-results.md` for what each field means.
+  - type: input
+    id: qualification
+    attributes:
+      label: Qualification
+      description: Non-empty qualification name, e.g. "A-Level".
+      placeholder: A-Level
+    validations:
+      required: true
+  - type: input
+    id: subject
+    attributes:
+      label: Subject
+      description: Leave blank for an overall result.
+      placeholder: Mathematics
+    validations:
+      required: false
+  - type: input
+    id: result
+    attributes:
+      label: Result
+      description: The real achieved or predicted grade/score. Never a placeholder.
+      placeholder: A*
+    validations:
+      required: true
+  - type: dropdown
+    id: status
+    attributes:
+      label: Predicted or achieved?
+      description: Only officially predicted results, not informal estimates.
+      options:
+        - achieved
+        - predicted
+    validations:
+      required: true
+  - type: input
+    id: awarding-body
+    attributes:
+      label: Awarding body
+      placeholder: AQA
+    validations:
+      required: true
+  - type: input
+    id: examination-session
+    attributes:
+      label: Examination session
+      description: Include the year.
+      placeholder: Summer 2026
+    validations:
+      required: true
+  - type: dropdown
+    id: evidence-checked
+    attributes:
+      label: Evidence checked?
+      description: >-
+        Have you personally checked the supporting evidence for this result?
+        This records a human review, not an automated verification.
+      options:
+        - "Yes"
+        - "No"
+    validations:
+      required: true
+  - type: input
+    id: effective-date
+    attributes:
+      label: Effective date (YYYY-MM-DD)
+      placeholder: "2026-08-15"
+    validations:
+      required: true
