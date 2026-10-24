@@ -12,6 +12,7 @@ type NoteCapability = (typeof noteCapabilities)[number];
 // produce comes from these controlled vocabularies (src/schemas/note.ts).
 // It never invents a label, and no generative AI is involved.
 const SUBJECT_KEYWORDS: Record<NoteSubject, readonly string[]> = {
+  English: ["english", "grammar", "vocabulary", "linguistics"],
   Mathematics: [
     "mathematics",
     "math",
@@ -100,6 +101,7 @@ const MEDIUM_KEYWORDS: Record<NoteMedium, readonly string[]> = {
 };
 
 const CAPABILITY_KEYWORDS: Record<NoteCapability, readonly string[]> = {
+  "Explains a language concept": ["grammar", "vocabulary", "linguistics"],
   "Explains a mathematical idea": [
     "mathematical idea",
     "theorem",

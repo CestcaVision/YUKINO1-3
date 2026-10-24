@@ -23,6 +23,19 @@ const scriptsDir = fileURLToPath(
 const MATH_EXPLANATION =
   "Completing the square rewrites a quadratic as a squared binomial plus a constant, which reveals the vertex of the parabola directly from the algebra.";
 
+it("classifies English briefs using the current shared vocabulary", () => {
+  const result = classifySourceBrief({
+    question: "How does English grammar express tense?",
+    explanation: "I explain the grammar of the past tense.",
+    example: "I walked home.",
+    uncertainties: "",
+    assistance: "",
+  });
+  expect(result.status).toBe("confirmed");
+  expect(result.subject).toBe("English");
+  expect(result.capabilities).toContain("Explains a language concept");
+});
+
 function representativeIssueBody({
   title = "Why does completing the square work?",
   question = "Why does completing the square always find the vertex of a parabola?",

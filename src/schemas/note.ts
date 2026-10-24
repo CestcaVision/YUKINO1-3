@@ -39,8 +39,14 @@ export const noteSchema = z
     updated: z.coerce.date().optional(),
     lifecycle: z.enum(["draft", "review", "published"]),
     authorship: z.enum(["student", "ai-generated"]).default("student"),
-    sourceIssue: z.string().regex(/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/issues\/[1-9]\d*$/).optional(),
-    sourceHash: z.string().regex(/^[a-f0-9]{64}$/).optional(),
+    sourceIssue: z
+      .string()
+      .regex(/^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/issues\/[1-9]\d*$/)
+      .optional(),
+    sourceHash: z
+      .string()
+      .regex(/^[a-f0-9]{64}$/)
+      .optional(),
     generationModel: z.string().trim().min(1).optional(),
     classification: z.enum(["confirmed", "pending"]).default("confirmed"),
     subject: z.enum(noteSubjects).optional(),
@@ -48,8 +54,16 @@ export const noteSchema = z
     capabilities: z.array(z.enum(noteCapabilities)).min(1).optional(),
   })
   .superRefine((data, ctx) => {
-    if (data.authorship === "ai-generated" && !(data.sourceIssue && data.sourceHash && data.generationModel)) {
-      ctx.addIssue({code: "custom", message: "AI-generated notes require sourceIssue, sourceHash, and generationModel", path: ["authorship"]});
+    if (
+      data.authorship === "ai-generated" &&
+      !(data.sourceIssue && data.sourceHash && data.generationModel)
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        message:
+          "AI-generated notes require sourceIssue, sourceHash, and generationModel",
+        path: ["authorship"],
+      });
     }
     if (data.updated && data.updated < data.date) {
       ctx.addIssue({
